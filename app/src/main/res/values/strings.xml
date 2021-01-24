@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MATVT - Mouse for Android TV Toggle</string>
+    <string name="accessibility_service_description">Control mouse cursor on your Android TV using your remote</string>
+</resources>
