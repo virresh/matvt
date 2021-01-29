@@ -39,4 +39,9 @@ public class MouseCursorView extends View {
         mPaintBox.setAlpha(mAlphaPointer);
         canvas.drawBitmap(mPointerBitmap, mPointerLocation.x, mPointerLocation.y, mPaintBox);
     }
+
+    public void updatePosition(PointF p) {
+        mPointerLocation.x = p.x;
+        mPointerLocation.y = p.y;
+    }
 }
