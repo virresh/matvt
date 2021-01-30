@@ -16,7 +16,7 @@ public class MouseEventService extends AccessibilityService {
     private boolean mStarted = false;
     private MouseEmulationEngine mEngine;
     private OverlayView mOverlayView;
-    private boolean mCursorCapture = false;
+    private boolean mCursorCapture = true;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
@@ -27,7 +27,9 @@ public class MouseEventService extends AccessibilityService {
     protected boolean onKeyEvent(KeyEvent event) {
         Log.i(LOG_TAG, event.toString());
         if (mCursorCapture) {
-            return mEngine.perform(event);
+            if (mEngine.perform(event)) {
+                return true;
+            };
         }
         return super.onKeyEvent(event);
     }
