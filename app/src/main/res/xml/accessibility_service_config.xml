@@ -7,5 +7,6 @@
     android:accessibilityFeedbackType="feedbackGeneric"
     android:notificationTimeout="100"
     android:canRetrieveWindowContent="true"
+    android:canPerformGestures="true"
     android:settingsActivity="io.github.virresh.matvt.gui.GuiActivity"
 />

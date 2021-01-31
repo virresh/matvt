@@ -23,7 +23,8 @@ public class OverlayView extends RelativeLayout {
                             WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
 
         overlayParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 
         overlayParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         overlayParams.height = WindowManager.LayoutParams.MATCH_PARENT;
