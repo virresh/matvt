@@ -1,8 +1,10 @@
 package io.github.virresh.matvt.engine.impl;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.GestureDescription;
 import android.app.Service;
 import android.content.Context;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -72,11 +74,67 @@ public class MouseEmulationEngine {
         timerHandler.postDelayed(previousRunnable, 0);
     }
 
+    private void attachActionable (final int action, final AccessibilityNodeInfo node) {
+        if (previousRunnable != null) {
+            detachPreviousTimer();
+        }
+        previousRunnable = new Runnable() {
+            @Override
+            public void run() {
+                node.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+                node.performAction(action);
+                node.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
+                timerHandler.postDelayed(this, 30);
+            }
+        };
+        timerHandler.postDelayed(previousRunnable, 0);
+    }
+
+    private void attachGesture (final PointF originPoint, final int direction) {
+        if (previousRunnable != null) {
+            detachPreviousTimer();
+        }
+        previousRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mService.dispatchGesture(createSwipe(originPoint, direction, momentumStack), null, null);
+                momentumStack += 1;
+                timerHandler.postDelayed(this, 30);
+            }
+        };
+        timerHandler.postDelayed(previousRunnable, 0);
+    }
+
     private void detachPreviousTimer () {
         if (previousRunnable != null) {
             timerHandler.removeCallbacks(previousRunnable);
             momentumStack = 0;
+            previousRunnable = null;
         }
+    }
+
+    private static GestureDescription createClick (PointF clickPoint) {
+        final int DURATION = 1;
+        Path clickPath = new Path();
+        clickPath.moveTo(clickPoint.x, clickPoint.y);
+        GestureDescription.StrokeDescription clickStroke =
+                new GestureDescription.StrokeDescription(clickPath, 0, DURATION);
+        GestureDescription.Builder clickBuilder = new GestureDescription.Builder();
+        clickBuilder.addStroke(clickStroke);
+        return clickBuilder.build();
+    }
+
+    private static GestureDescription createSwipe (PointF originPoint, int direction, int momentum) {
+        final int DURATION = 10;
+        Path clickPath = new Path();
+        PointF lineDirection = new PointF(originPoint.x + momentum * PointerControl.dirX[direction], originPoint.y + momentum * PointerControl.dirY[direction]);
+        clickPath.moveTo(originPoint.x, originPoint.y);
+        clickPath.lineTo(lineDirection.x, lineDirection.y);
+        GestureDescription.StrokeDescription clickStroke =
+                new GestureDescription.StrokeDescription(clickPath, 0, DURATION);
+        GestureDescription.Builder clickBuilder = new GestureDescription.Builder();
+        clickBuilder.addStroke(clickStroke);
+        return clickBuilder.build();
     }
 
     public boolean perform (KeyEvent keyEvent) {
@@ -86,38 +144,102 @@ public class MouseEmulationEngine {
                 attachTimer(PointerControl.UP);
                 consumed = true;
             }
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
                 attachTimer(PointerControl.DOWN);
                 consumed = true;
             }
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
                 attachTimer(PointerControl.LEFT);
                 consumed = true;
             }
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
                 attachTimer(PointerControl.RIGHT);
                 consumed = true;
             }
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_RED) {
+                // backward or swipe up
+//                int action = AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD;
+//                Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
+//                AccessibilityNodeInfo hitNode = findNode(null, AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD, pInt);
+//                if (hitNode != null) {
+//                    attachActionable(action, hitNode);
+//                    consumed = true;
+//                }
+                attachGesture(mPointerControl.getPointerLocation(), PointerControl.UP);
+                consumed = true;
+            }
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_GREEN) {
+                // forward or swipe down
+                attachGesture(mPointerControl.getPointerLocation(), PointerControl.DOWN);
+                consumed = true;
+            }
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_YELLOW) {
+                // swipe left
+                attachGesture(mPointerControl.getPointerLocation(), PointerControl.LEFT);
+                consumed = true;
+            }
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_BLUE) {
+                // swipe right
+                attachGesture(mPointerControl.getPointerLocation(), PointerControl.RIGHT);
+                consumed = true;
+            }
+            else if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
+                // just consume this event to prevent propagation
+                consumed = true;
+            }
         }
-        if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
+        else if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
+            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
+                    || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN
+                    || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT
+                    || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT
+                    || keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_RED
+                    || keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_GREEN) {
                 detachPreviousTimer();
+                consumed = true;
             }
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
-                Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
-                AccessibilityNodeInfo hitNode = findNode(null, AccessibilityNodeInfo.ACTION_CLICK, pInt);
-                if (hitNode != null) {
-                    consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
+                int action = AccessibilityNodeInfo.ACTION_CLICK;
+                if (keyEvent.getEventTime() - keyEvent.getDownTime() > 500) {
+                    action = AccessibilityNodeInfo.ACTION_LONG_CLICK;
+                    Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
+                    AccessibilityNodeInfo hitNode = findNode(null, action, pInt);
+
+                    if (hitNode != null) {
+                        hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
+                        consumed = hitNode.performAction(action);
+                    }
                 }
+                else {
+                    mService.dispatchGesture(createClick(mPointerControl.getPointerLocation()), null, null);
+                    return false;
+                }
+
             }
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-                if (keyEvent.getEventTime() - keyEvent.getDownTime() > 1000) {
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                if (keyEvent.getEventTime() - keyEvent.getDownTime() > 500) {
                     this.mService.disableSelf();
                     consumed = true;
                 }
             }
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_GREEN) {
-                mPointerControl.reset();
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_GREEN) {
+                // forward or swipe down
+                detachPreviousTimer();
+                consumed = true;
+            }
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_YELLOW) {
+                // swipe left
+                detachPreviousTimer();
+                consumed = true;
+            }
+            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_BLUE) {
+                // swipe right
+                detachPreviousTimer();
+                consumed = true;
+            }
+            else if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
+                // just consume this event to prevent propagation
+                consumed = true;
             }
         }
         Log.i(LOG_TAG, "Consumed by mouse Emulator? " + consumed);
@@ -148,13 +270,14 @@ public class MouseEmulationEngine {
             return null;
         }
         AccessibilityNodeInfo result = null;
-        if ((node.getActions() & action) != 0) {
-            // possible to use this one, but keep searching children as well
-            result = node;
-        }
+        result = node;
+//        if ((node.getActions() & action) != 0) {
+//            // possible to use this one, but keep searching children as well
+//            result = node;
+//        }
         int childCount = node.getChildCount();
         for (int i=0; i<childCount; i++) {
-            AccessibilityNodeInfo child = findNode(node.getChild(i), action, pInt);
+            AccessibilityNodeInfo child = findNodeHelper(node.getChild(i), action, pInt);
             if (child != null) {
                 // always picks the last innermost clickable child
                 result = child;

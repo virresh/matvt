@@ -18,8 +18,8 @@ public class PointerControl {
     public static int DOWN = 3;
 
     // Left, Up, Right, Down
-    private int[] dirX = {-1, 0, 1,  0};
-    private int[] dirY = { 0, -1, 0, 1};
+    public static int[] dirX = {-1, 0, 1,  0};
+    public static int[] dirY = { 0, -1, 0, 1};
 
     // pointer location in screen coordinates
     private PointF mPointerLocation = new PointF();
