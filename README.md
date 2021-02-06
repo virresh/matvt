@@ -59,3 +59,7 @@ If you have gotten yourself in this situation, see FAQ.
 
 - **I think there's something that can be improved. How to contribute?**
   I welcome all kinds of contributions. Documentation, Code tests, Actual Hardware Testing etc etc. Please feel free to create a Pull request and remind me in a couple of weeks if I forget about it :D
+
+
+# Credits
+Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse
