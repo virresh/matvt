@@ -45,17 +45,17 @@ If you have gotten yourself in this situation, see FAQ.
 
 # FAQs
 
-- Is this tested?
+- **Is this tested?**
   Yes, I have tested it on Sony Android TV. So any other Android TVs running Android 9 should work.
 
-- I didn't follow instructions properly and have soft-bricked myself, now what?
+- **I didn't follow instructions properly and have soft-bricked myself, now what?**
   You'll need a physical mouse to go to accessibility services and disable MATVT. And this time before re-enabling it, please follow instructions and give the service proper permissions. You can also use a keyboard, but it'll be way more tedious.
 
-- I didn't follow instructions and was not soft-bricked, why all the warnings?
+- **I didn't follow instructions and was not soft-bricked, why all the warnings?**
   You should consider yourself lucky then :p. But be aware that the warnings are put there from a real experience.
 
-- So, how does it work?
+- **So, how does it work?**
   You have the exact code in front of you, feel free to read it { It's not that bad ;) }. In a nutshell, this app uses Accessibility features provided by Android.
 
-- I think there's something that can be improved. How to contribute?
+- **I think there's something that can be improved. How to contribute?**
   I welcome all kinds of contributions. Documentation, Code tests, Actual Hardware Testing etc etc. Please feel free to create a Pull request and remind me in a couple of weeks if I forget about it :D
