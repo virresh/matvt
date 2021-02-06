@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -39,6 +40,8 @@ public class MouseEmulationEngine {
     private KeyEvent lastEvent;
     private int momentumStack;
 
+    private boolean isEnabled;
+
     private Handler timerHandler;
     private Runnable previousRunnable;
 
@@ -48,6 +51,7 @@ public class MouseEmulationEngine {
         mCursorView = new MouseCursorView(c);
         ov.addFullScreenLayer(mCursorView);
         mPointerControl = new PointerControl(ov, mCursorView);
+        mPointerControl.disappear();
         Log.i(LOG_TAG, "X, Y: " + mPointerControl.getPointerLocation().x + ", " + mPointerControl.getPointerLocation().y);
     }
 
@@ -56,6 +60,7 @@ public class MouseEmulationEngine {
         mPointerControl.reset();
         lastEvent = null;
         timerHandler = new Handler();
+        isEnabled = false;
         return true;
     }
 
@@ -66,6 +71,7 @@ public class MouseEmulationEngine {
         previousRunnable = new Runnable() {
             @Override
             public void run() {
+                mPointerControl.reappear();
                 mPointerControl.move(direction, momentumStack);
                 momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
@@ -81,6 +87,7 @@ public class MouseEmulationEngine {
         previousRunnable = new Runnable() {
             @Override
             public void run() {
+                mPointerControl.reappear();
                 node.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
                 node.performAction(action);
                 node.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
@@ -97,7 +104,8 @@ public class MouseEmulationEngine {
         previousRunnable = new Runnable() {
             @Override
             public void run() {
-                mService.dispatchGesture(createSwipe(originPoint, direction, momentumStack), null, null);
+                mPointerControl.reappear();
+                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
                 momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
@@ -108,8 +116,14 @@ public class MouseEmulationEngine {
     private void detachPreviousTimer () {
         if (previousRunnable != null) {
             timerHandler.removeCallbacks(previousRunnable);
+            previousRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    mPointerControl.disappear();
+                }
+            };
+            timerHandler.postDelayed(previousRunnable, 30000);
             momentumStack = 0;
-            previousRunnable = null;
         }
     }
 
@@ -138,6 +152,29 @@ public class MouseEmulationEngine {
     }
 
     public boolean perform (KeyEvent keyEvent) {
+        // info key get's special treatment
+        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_INFO) {
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                if (isEnabled) {
+                    // mouse already enabled, disable it and make it go away
+                    this.isEnabled = false;
+                    mPointerControl.disappear();
+                    Toast.makeText(mService, "Mouse Gone", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else {
+                    // mouse is disabled, enable it, reset it and show it
+                    this.isEnabled = true;
+                    mPointerControl.reset();
+                    mPointerControl.reappear();
+                    Toast.makeText(mService, "Mouse On", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            }
+        }
+        if (!isEnabled) {
+            // don't consume anything
+            return false;
+        }
         boolean consumed = false;
         if (keyEvent.getAction() == KeyEvent.ACTION_DOWN){
             if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
@@ -199,6 +236,7 @@ public class MouseEmulationEngine {
                 consumed = true;
             }
             else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
+                detachPreviousTimer();
                 int action = AccessibilityNodeInfo.ACTION_CLICK;
                 if (keyEvent.getEventTime() - keyEvent.getDownTime() > 500) {
                     action = AccessibilityNodeInfo.ACTION_LONG_CLICK;
@@ -235,10 +273,6 @@ public class MouseEmulationEngine {
             else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_PROG_BLUE) {
                 // swipe right
                 detachPreviousTimer();
-                consumed = true;
-            }
-            else if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
-                // just consume this event to prevent propagation
                 consumed = true;
             }
         }
