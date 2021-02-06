@@ -2,6 +2,7 @@ package io.github.virresh.matvt.engine.impl;
 
 import android.graphics.PointF;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
@@ -46,6 +47,18 @@ public class PointerControl {
         Log.i(LOG_TAG, "View W, H: " + mPointerLayerView.getWidth() + " " + mPointerLayerView.getHeight());
         Log.i(LOG_TAG, "Location X, Y: " + mPointerLocation.x + " " + mPointerLocation.y);
         mCursorView.updatePosition(mPointerLocation);
+    }
+
+    public void disappear () {
+        if (mCursorView.getVisibility() == View.VISIBLE) {
+            mCursorView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void reappear () {
+        if (mCursorView.getVisibility() == View.INVISIBLE) {
+            mCursorView.setVisibility(View.VISIBLE);
+        }
     }
 
     public void move (int direction, int momentum) {
