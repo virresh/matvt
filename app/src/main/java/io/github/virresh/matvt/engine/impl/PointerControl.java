@@ -23,13 +23,13 @@ public class PointerControl {
     public static int[] dirY = { 0, -1, 0, 1};
 
     // pointer location in screen coordinates
-    private PointF mPointerLocation = new PointF();
+    private final PointF mPointerLocation = new PointF();
 
     // view to display the pointer
-    private OverlayView mPointerLayerView;
+    private final OverlayView mPointerLayerView;
 
     // cursor view
-    private MouseCursorView mCursorView;
+    private final MouseCursorView mCursorView;
 
     // constructor
     PointerControl(@NonNull OverlayView pv, MouseCursorView mv){
@@ -42,8 +42,8 @@ public class PointerControl {
      * Reset pointer location by centering it
      */
     public void reset () {
-        mPointerLocation.x = mPointerLayerView.getWidth() / 2;
-        mPointerLocation.y = mPointerLayerView.getHeight() / 2;
+        mPointerLocation.x = mPointerLayerView.getWidth() / 2f;
+        mPointerLocation.y = mPointerLayerView.getHeight() / 2f;
         Log.i(LOG_TAG, "View W, H: " + mPointerLayerView.getWidth() + " " + mPointerLayerView.getHeight());
         Log.i(LOG_TAG, "Location X, Y: " + mPointerLocation.x + " " + mPointerLocation.y);
         mCursorView.updatePosition(mPointerLocation);

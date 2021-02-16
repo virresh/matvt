@@ -2,74 +2,50 @@ package io.github.virresh.matvt.services;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.usage.UsageEvents;
+import android.content.Context;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 
 import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
+import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.view.OverlayView;
+
+import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
 
 public class MouseEventService extends AccessibilityService {
 
-    private static String LOG_TAG = "MATVT_SERVICE";
-    private static MouseEventService sMouseEventService;
-    private boolean mStarted = false;
     private MouseEmulationEngine mEngine;
-    private OverlayView mOverlayView;
-    private boolean mCursorCapture = true;
 
     @Override
-    public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
-
-    }
+    public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {}
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
-        Log.i(LOG_TAG, event.toString());
-        if (mCursorCapture) {
-            if (mEngine.perform(event)) {
-                return true;
-            };
-        }
-        return super.onKeyEvent(event);
+        if (Helper.isOverlayDisabled(this)) return false;
+        return mEngine.perform(event);
     }
 
     @Override
-    public void onInterrupt() {
+    public void onInterrupt() {}
 
-    }
-
-    /**
-     * The service is turned on
-     */
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-        Log.i(LOG_TAG, "TV Service Connected!");
-        init();
+        bossKey = KeyEvent.KEYCODE_VOLUME_MUTE;
+        bossKey = KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE; //For Testing
+        if (Settings.canDrawOverlays(this))
+            init();
     }
 
     private void init() {
-        if (mStarted) {
-            Log.i(LOG_TAG, "MouseEventService is already running");
-            return;
-        }
-
-        sMouseEventService = this;
-        mOverlayView = new OverlayView(this);
-        initEngine();
-    }
-
-    private void initEngine() {
-        if (mEngine != null) {
-            Log.i(LOG_TAG, "Mouse Emulation Engine already running");
-        }
+        OverlayView mOverlayView = new OverlayView(this);
         mEngine = new MouseEmulationEngine(this, mOverlayView);
-        Log.i(LOG_TAG, "Overlay Engine W, H " + mOverlayView.getWidth() + " " + mOverlayView.getHeight());
         mEngine.init(this);
-    }
-
-    public void setCursorCapture(boolean val) {
-        mCursorCapture = val;
     }
 }
