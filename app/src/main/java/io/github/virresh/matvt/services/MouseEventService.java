@@ -1,14 +1,7 @@
 package io.github.virresh.matvt.services;
 
 import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.AccessibilityServiceInfo;
-import android.app.usage.UsageEvents;
-import android.content.Context;
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 
@@ -27,6 +20,9 @@ public class MouseEventService extends AccessibilityService {
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
+        super.onKeyEvent(event);
+        if (Helper.isAnotherServiceInstalled(this) &&
+                event.getKeyCode() == KeyEvent.KEYCODE_HOME) return true;
         if (Helper.isOverlayDisabled(this)) return false;
         return mEngine.perform(event);
     }
@@ -38,9 +34,8 @@ public class MouseEventService extends AccessibilityService {
     protected void onServiceConnected() {
         super.onServiceConnected();
         bossKey = KeyEvent.KEYCODE_VOLUME_MUTE;
-        bossKey = KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE; //For Testing
-        if (Settings.canDrawOverlays(this))
-            init();
+        if (Helper.isOverriding(this)) bossKey = Helper.getOverrideValue(this);
+        if (Settings.canDrawOverlays(this)) init();
     }
 
     private void init() {

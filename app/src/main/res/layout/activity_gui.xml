@@ -3,24 +3,19 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
     android:padding="20.0dip">
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Virtual Mouse for Android TV\nby virresh "
-        android:textAlignment="center" />
-
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20.0dip"
-        android:text="Status"
+        android:text="Service Status"
         android:textAlignment="center"
-        android:textColor="#ffff0000"
+        android:textColor="#CA0000"
         android:textSize="20.0sp" />
 
     <TextView
+        android:textColor="@color/white"
         android:id="@+id/gui_acc_perm"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -29,6 +24,7 @@
         android:textSize="20.0sp" />
 
     <TextView
+        android:textColor="@color/white"
         android:id="@+id/gui_acc_serv"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -37,6 +33,7 @@
         android:textSize="20.0sp" />
 
     <TextView
+        android:textColor="@color/white"
         android:id="@+id/gui_overlay_perm"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -45,6 +42,7 @@
         android:textSize="20.0sp" />
 
     <TextView
+        android:textColor="@color/white"
         android:id="@+id/gui_overlay_serv"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -53,10 +51,67 @@
         android:textSize="20.0sp" />
 
     <Button
-        android:id="@+id/gui_setup"
+        android:textColor="@color/white"
+        android:background="@drawable/button_background"
+        android:id="@+id/gui_setup_perm"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20.0dip"
         android:text="SETUP PERMISSIONS" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20.0dip"
+        android:text="Other Settings"
+        android:textAlignment="center"
+        android:textColor="#CA0000"
+        android:textSize="20.0sp" />
+
+    <CheckBox
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:buttonTint="@color/white"
+        android:id="@+id/cb_override"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="Override Activation Key"
+        android:layoutDirection="rtl"/>
+
+    <LinearLayout
+        android:weightSum="1"
+        android:orientation="horizontal"
+        android:id="@+id/boss_override"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:inputType="number"
+            android:hint="(Default: 164)"
+            android:id="@+id/et_override"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.20"
+            android:textColorHint="@color/white_2"
+            android:buttonTint="@color/white"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <Button
+            android:layout_weight="0.80"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:buttonTint="@color/white"
+            android:text="SAVE"
+            android:background="@drawable/button_background"
+            android:id="@+id/bt_override"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 </LinearLayout>
