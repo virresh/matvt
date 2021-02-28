@@ -35,6 +35,7 @@ trust the release apk ;)
 - Toggling mouse visibility via the Info button resets cursor position
 - The mouse warps around your TV sides, so you can roll over from the top of your TV to the bottom instantly
 - Mouse movement is momentum based, so keeping key pressed for longer will increase the movement / send multiple swipes
+- For remotes who don't have the above buttons, a `Boss Key` is available which can be used to toggle between mouse mode / scroll mode / dpad mode. By default this is the mute key, but can be overridden in the configuration settings. See the Youtube video linked below by TechDoctorUK for a demo of how that works.
 
 
 Shoutout to @sweenwolf for enhancing the app to work on tv boxes with less remote buttons.
@@ -58,7 +59,7 @@ If you have gotten yourself in this situation, see FAQ.
   You'll need a physical mouse to go to accessibility services and disable MATVT. And this time before re-enabling it, please follow instructions and give the service proper permissions. You can also use a keyboard, but it'll be way more tedious.
 
 - **I didn't follow instructions and was not soft-bricked, why all the warnings?**
-  You should consider yourself lucky then :p. But be aware that the warnings are put there from a real experience.
+  You should consider yourself lucky then :p. But be aware that the warnings are put there from a real experience. Though thanks to community contributions, this is probably fixed in some newer versions for most TV boxes.
 
 - **So, how does it work?**
   You have the exact code in front of you, feel free to read it { It's not that bad ;) }. In a nutshell, this app uses Accessibility features provided by Android.
@@ -68,6 +69,6 @@ If you have gotten yourself in this situation, see FAQ.
 
 
 # Credits
-Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse
-Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent curson images
-Thanks to TechDoctorUK for making a demo video
+Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse 
+Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent curson images  
+Thanks to TechDoctorUK for making a demo video  
