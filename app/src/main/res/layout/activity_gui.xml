@@ -1,22 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".gui.GuiActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
+    android:padding="20.0dip">
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20.0dip"
+        android:text="Service Status"
+        android:textAlignment="center"
+        android:textColor="#CA0000"
+        android:textSize="20.0sp" />
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="536dp"
-        android:layout_height="121dp"
-        android:layout_marginStart="212dp"
-        android:layout_marginTop="210dp"
-        android:layout_marginEnd="213dp"
-        android:layout_marginBottom="210dp"
-        android:text="Button Events"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:textColor="@color/white"
+        android:id="@+id/gui_acc_perm"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Accessibility Permission"
+        android:textAlignment="textStart"
+        android:textSize="20.0sp" />
+
+    <TextView
+        android:textColor="@color/white"
+        android:id="@+id/gui_acc_serv"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Accessibility Service"
+        android:textAlignment="textStart"
+        android:textSize="20.0sp" />
+
+    <TextView
+        android:textColor="@color/white"
+        android:id="@+id/gui_overlay_perm"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Overlay Permission"
+        android:textAlignment="textStart"
+        android:textSize="20.0sp" />
+
+    <TextView
+        android:textColor="@color/white"
+        android:id="@+id/gui_overlay_serv"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Overlay Service"
+        android:textAlignment="textStart"
+        android:textSize="20.0sp" />
+
+    <Button
+        android:id="@+id/gui_setup_perm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20.0dip"
+        android:background="@drawable/button_background"
+        android:nextFocusDown="@id/dsbar_mouse_size"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:text="SETUP PERMISSIONS"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20.0dip"
+        android:text="Other Settings"
+        android:textAlignment="center"
+        android:textColor="#CA0000"
+        android:textSize="20.0sp" />
+
+
+    <LinearLayout
+        android:id="@+id/mouse_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mouse Size (Low to High)"
+            android:textAlignment="textStart"
+            android:textColor="@color/white"
+            android:textSize="20.0sp" />
+
+        <SeekBar
+            android:id="@+id/dsbar_mouse_size"
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:foregroundTint="@color/white"
+            android:max="4"
+            android:nextFocusUp="@id/gui_setup_perm"
+            android:nextFocusDown="@id/sp_mouse_icon"
+            android:progress="1"
+            android:progressBackgroundTint="@color/white_2"
+            android:progressTint="@color/white"
+            android:thumbTint="@color/white"
+            android:tickMarkTint="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mouse_icon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="Mouse Icon"
+            android:textAlignment="textStart"
+            android:textColor="@color/white"
+            android:textSize="20.0sp" />
+
+        <Spinner
+            android:id="@+id/sp_mouse_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:drawSelectorOnTop="true"
+            android:dropDownWidth="match_parent"
+            android:nextFocusUp="@id/dsbar_mouse_size"
+            android:nextFocusDown="@id/cb_override"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/cb_override"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:buttonTint="@color/white"
+        android:layoutDirection="rtl"
+        android:nextFocusUp="@id/sp_mouse_icon"
+        android:text="Override Activation Key"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:weightSum="1"
+        android:orientation="horizontal"
+        android:id="@+id/boss_override"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:inputType="number"
+            android:hint="(Default: 164)"
+            android:id="@+id/et_override"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.20"
+            android:textColorHint="@color/white_2"
+            android:buttonTint="@color/white"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/bt_override"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.80"
+            android:background="@drawable/button_background"
+            android:buttonTint="@color/white"
+            android:nextFocusUp="@id/cb_override"
+            android:text="SAVE"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+</LinearLayout>

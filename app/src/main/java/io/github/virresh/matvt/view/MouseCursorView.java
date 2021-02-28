@@ -1,5 +1,6 @@
 package io.github.virresh.matvt.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,6 +10,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 
 import io.github.virresh.matvt.R;
+import io.github.virresh.matvt.gui.IconStyleSpinnerAdapter;
+import io.github.virresh.matvt.helper.Helper;
 
 /**
  * Draw a Mouse Cursor on screen
@@ -16,11 +19,11 @@ import io.github.virresh.matvt.R;
 public class MouseCursorView extends View {
     private static final int DEFAULT_ALPHA= 255;
 
-    private PointF mPointerLocation;
-    private Paint mPaintBox;
-    private Bitmap mPointerBitmap;
-    private int mAlphaPointer= DEFAULT_ALPHA;
-
+    private final PointF mPointerLocation;
+    private final Paint mPaintBox;
+    private final Bitmap mPointerBitmap;
+    private int pointerDrawableReference;
+    private int pointerSizeReference;
 
     public MouseCursorView(Context context) {
         super(context);
@@ -28,15 +31,25 @@ public class MouseCursorView extends View {
         mPointerLocation = new PointF();
         mPaintBox = new Paint();
 
-        BitmapDrawable bp = (BitmapDrawable) getContext().getResources().getDrawable(R.drawable.pointer);
+        updateFromPreferences();
+
+        @SuppressLint("UseCompatLoadingForDrawables")
+        BitmapDrawable bp = (BitmapDrawable) context.getDrawable(pointerDrawableReference);
         Bitmap originalBitmap = bp.getBitmap();
-        mPointerBitmap = originalBitmap;
+        BitmapDrawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(originalBitmap, 50 * pointerSizeReference, 50 * pointerSizeReference, true));
+        mPointerBitmap = d.getBitmap();
+    }
+
+    public void updateFromPreferences() {
+        Context ctx = getContext();
+        pointerDrawableReference = IconStyleSpinnerAdapter.textToResourceIdMap.getOrDefault(Helper.getMouseIconPref(ctx), R.drawable.pointer);
+        pointerSizeReference = Helper.getMouseSizePref(ctx) + 1;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mPaintBox.setAlpha(mAlphaPointer);
+        mPaintBox.setAlpha(DEFAULT_ALPHA);
         canvas.drawBitmap(mPointerBitmap, mPointerLocation.x, mPointerLocation.y, mPaintBox);
     }
 

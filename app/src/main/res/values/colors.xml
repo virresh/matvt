@@ -1,6 +1,10 @@
 <resources>
-    <color name="light_blue_400">#FF29B6F6</color>
-    <color name="light_blue_600">#FF039BE5</color>
-    <color name="gray_400">#FFBDBDBD</color>
-    <color name="gray_600">#FF757575</color>
+    <color name="ic_launcher_background">#006168</color>
+    <color name="colorPrimary">#ff012b3b</color>
+    <color name="colorPrimaryDark">#ff01222f</color>
+    <color name="colorAccent">#ffff6138</color>
+    <color name="blue">#ff00b5f7</color>
+    <color name="black">#ff000000</color>
+    <color name="white">#ffffffff</color>
+    <color name="white_2">#D2E3E3E3</color>
 </resources>

@@ -7,7 +7,8 @@ Feeling the need to have a touch input in your Android TV?
 Or just looking for an alternative to the famous Mouse Toggle App for your TV?
 
 MATVT solves all the above. Unfortunately, it's not on the playstore, and there are no plans to
-launch it there either.
+launch it there either. If you'd like to see it on playstore, please let me know in the issues
+tab (any support is also graciously accepted).
 
 ## So what does this app do?
 MATVT is intended for users running Android TV (Android version 9+) and have a big remote with
@@ -34,6 +35,11 @@ trust the release apk ;)
 - Toggling mouse visibility via the Info button resets cursor position
 - The mouse warps around your TV sides, so you can roll over from the top of your TV to the bottom instantly
 - Mouse movement is momentum based, so keeping key pressed for longer will increase the movement / send multiple swipes
+
+
+Shoutout to @sweenwolf for enhancing the app to work on tv boxes with less remote buttons.
+See a demo of the modified version in action by TechDoctorUK at:
+[https://youtu.be/UC7bPw2tG4c](https://youtu.be/UC7bPw2tG4c)
 
 # Important points to know After Installing
 - Be sure to go to Special App Permissions in your settings and give permission to MATVT to draw over
@@ -63,3 +69,5 @@ If you have gotten yourself in this situation, see FAQ.
 
 # Credits
 Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse
+Thanks to @sweenwolf for making this app work on remotes with less buttons
+Thanks to TechDoctorUK for making a demo video

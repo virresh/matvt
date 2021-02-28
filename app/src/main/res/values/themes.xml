@@ -1,4 +1,10 @@
 <resources>
-
-    <style name="Theme.MATVTMouseForAndroidTVToggle" parent="@style/Theme.Leanback" />
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="colorControlHighlight">@color/colorAccent</item>
+    </style>
 </resources>

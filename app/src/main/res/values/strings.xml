@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">MATVT - Mouse for Android TV Toggle</string>
     <string name="accessibility_service_description">Control mouse cursor on your Android TV using your remote</string>
+    <string name="perm_acc_allowed">Accessibility Permissions : Granted</string>
+    <string name="perm_acc_denied">Accessibility Permissions : Not Granted</string>
+    <string name="perm_overlay_allowed">Overlay Permissions : Granted</string>
+    <string name="perm_overlay_denied">Overlay Permissions : Not Granted</string>
+    <string name="serv_acc_allowed">Accessibility Service : Running</string>
+    <string name="serv_acc_denied">Accessibility Service : Not Running</string>
+    <string name="serv_overlay_allowed">Overlay Service : Running</string>
+    <string name="serv_overlay_denied">Overlay Service : Not Running</string>
+    <string-array name="mouse_style_arr">
+        <item>Dark (default)</item>
+        <item>Light</item>
+    </string-array>
 </resources>
