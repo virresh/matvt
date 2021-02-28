@@ -30,7 +30,7 @@ trust the release apk ;)
 - DPAD is for movement and single clicks (I think I added long click support too, but isn't very reliable)
 - The color buttons are for swiping. RED and GREEN for up/down swipe, YELLOW and BLUE for left/right swipe
 - Info button will instantly toggle mouse visibility (so you can switch between mouse and no mouse instantly)
-- Pressing back button for more than 3 seconds will disable the accessibility service completely
+- ~~Pressing back button for more than 3 seconds will disable the accessibility service completely~~ This is now removed.
 - The mouse will auto-disappear after a short while and re-appear when you press another relevant button.
 - Toggling mouse visibility via the Info button resets cursor position
 - The mouse warps around your TV sides, so you can roll over from the top of your TV to the bottom instantly
