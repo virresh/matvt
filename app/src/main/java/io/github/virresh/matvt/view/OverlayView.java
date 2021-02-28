@@ -27,7 +27,8 @@ public class OverlayView extends RelativeLayout {
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 
         } else {
-            overlayParams.flags = 0x18;
+            overlayParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             overlayParams.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
         }
 

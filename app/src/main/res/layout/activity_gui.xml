@@ -51,16 +51,17 @@
         android:textSize="20.0sp" />
 
     <Button
-        android:textColor="@color/white"
-        android:background="@drawable/button_background"
         android:id="@+id/gui_setup_perm"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20.0dip"
-        android:text="SETUP PERMISSIONS" />
+        android:background="@drawable/button_background"
+        android:nextFocusDown="@id/dsbar_mouse_size"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:text="SETUP PERMISSIONS"
+        android:textColor="@color/white" />
 
     <TextView
         android:layout_width="fill_parent"
@@ -71,16 +72,78 @@
         android:textColor="#CA0000"
         android:textSize="20.0sp" />
 
+
+    <LinearLayout
+        android:id="@+id/mouse_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mouse Size (Low to High)"
+            android:textAlignment="textStart"
+            android:textColor="@color/white"
+            android:textSize="20.0sp" />
+
+        <SeekBar
+            android:id="@+id/dsbar_mouse_size"
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:foregroundTint="@color/white"
+            android:max="4"
+            android:nextFocusUp="@id/gui_setup_perm"
+            android:nextFocusDown="@id/sp_mouse_icon"
+            android:progress="1"
+            android:progressBackgroundTint="@color/white_2"
+            android:progressTint="@color/white"
+            android:thumbTint="@color/white"
+            android:tickMarkTint="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mouse_icon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="Mouse Icon"
+            android:textAlignment="textStart"
+            android:textColor="@color/white"
+            android:textSize="20.0sp" />
+
+        <Spinner
+            android:id="@+id/sp_mouse_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:drawSelectorOnTop="true"
+            android:dropDownWidth="match_parent"
+            android:nextFocusUp="@id/dsbar_mouse_size"
+            android:nextFocusDown="@id/cb_override"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
+
     <CheckBox
-        android:textSize="20sp"
-        android:textColor="@color/white"
-        android:buttonTint="@color/white"
         android:id="@+id/cb_override"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:buttonTint="@color/white"
+        android:layoutDirection="rtl"
+        android:nextFocusUp="@id/sp_mouse_icon"
         android:text="Override Activation Key"
-        android:layoutDirection="rtl"/>
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
     <LinearLayout
         android:weightSum="1"
@@ -103,15 +166,16 @@
             android:textSize="20sp" />
 
         <Button
-            android:layout_weight="0.80"
-            android:textSize="20sp"
-            android:textColor="@color/white"
-            android:buttonTint="@color/white"
-            android:text="SAVE"
-            android:background="@drawable/button_background"
             android:id="@+id/bt_override"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_weight="0.80"
+            android:background="@drawable/button_background"
+            android:buttonTint="@color/white"
+            android:nextFocusUp="@id/cb_override"
+            android:text="SAVE"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
     </LinearLayout>
 </LinearLayout>

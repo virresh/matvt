@@ -16,6 +16,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 
@@ -41,6 +47,56 @@ public class MouseEmulationEngine {
     private Handler timerHandler;
 
     private Runnable previousRunnable;
+
+    // tells which keycodes correspond to which pointer movement in scroll and movement mode
+    // scroll directions don't match keycode instruction because that's how swiping works
+    private static final Map<Integer, Integer> scrollCodeMap;
+    static {
+        Map<Integer, Integer> integerMap = new HashMap<>();
+        integerMap.put(KeyEvent.KEYCODE_DPAD_UP, PointerControl.DOWN);
+        integerMap.put(KeyEvent.KEYCODE_DPAD_DOWN, PointerControl.UP);
+        integerMap.put(KeyEvent.KEYCODE_DPAD_LEFT, PointerControl.RIGHT);
+        integerMap.put(KeyEvent.KEYCODE_DPAD_RIGHT, PointerControl.LEFT);
+        integerMap.put(KeyEvent.KEYCODE_PROG_GREEN, PointerControl.DOWN);
+        integerMap.put(KeyEvent.KEYCODE_PROG_RED, PointerControl.UP);
+        integerMap.put(KeyEvent.KEYCODE_PROG_BLUE, PointerControl.RIGHT);
+        integerMap.put(KeyEvent.KEYCODE_PROG_YELLOW, PointerControl.LEFT);
+        scrollCodeMap = Collections.unmodifiableMap(integerMap);
+    }
+
+    private static final Map<Integer, Integer> movementCodeMap;
+    static {
+        Map<Integer, Integer> integerMap = new HashMap<>();
+        integerMap.put(KeyEvent.KEYCODE_DPAD_UP, PointerControl.UP);
+        integerMap.put(KeyEvent.KEYCODE_DPAD_DOWN, PointerControl.DOWN);
+        integerMap.put(KeyEvent.KEYCODE_DPAD_LEFT, PointerControl.LEFT);
+        integerMap.put(KeyEvent.KEYCODE_DPAD_RIGHT, PointerControl.RIGHT);
+        movementCodeMap = Collections.unmodifiableMap(integerMap);
+    }
+
+    private static final Set<Integer> actionableKeyMap;
+    static {
+        Set<Integer> integerSet = new HashSet<>();
+        integerSet.add(KeyEvent.KEYCODE_DPAD_UP);
+        integerSet.add(KeyEvent.KEYCODE_DPAD_DOWN);
+        integerSet.add(KeyEvent.KEYCODE_DPAD_LEFT);
+        integerSet.add(KeyEvent.KEYCODE_DPAD_RIGHT);
+        integerSet.add(KeyEvent.KEYCODE_PROG_GREEN);
+        integerSet.add(KeyEvent.KEYCODE_PROG_YELLOW);
+        integerSet.add(KeyEvent.KEYCODE_PROG_BLUE);
+        integerSet.add(KeyEvent.KEYCODE_PROG_RED);
+        actionableKeyMap = Collections.unmodifiableSet(integerSet);
+    }
+
+    private static final Set<Integer> colorSet;
+    static {
+        Set<Integer> integerSet = new HashSet<>();
+        integerSet.add(KeyEvent.KEYCODE_PROG_GREEN);
+        integerSet.add(KeyEvent.KEYCODE_PROG_YELLOW);
+        integerSet.add(KeyEvent.KEYCODE_PROG_BLUE);
+        integerSet.add(KeyEvent.KEYCODE_PROG_RED);
+        colorSet = Collections.unmodifiableSet(integerSet);
+    }
 
     public MouseEmulationEngine (Context c, OverlayView ov) {
         momentumStack = 0;
@@ -75,25 +131,13 @@ public class MouseEmulationEngine {
         timerHandler.postDelayed(previousRunnable, 0);
     }
 
-    /** Not used
-//    private void attachActionable (final int action, final AccessibilityNodeInfo node) {
-//        if (previousRunnable != null) {
-//            detachPreviousTimer();
-//        }
-//        previousRunnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                mPointerControl.reappear();
-//                node.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
-//                node.performAction(action);
-//                node.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
-//                timerHandler.postDelayed(this, 30);
-//            }
-//        };
-//        timerHandler.postDelayed(previousRunnable, 0);
-//    }
-**/
-
+    /**
+     * Send input via Android's gestureAPI
+     * Only sends swipes
+     * see {@link MouseEmulationEngine#createClick(PointF)} for clicking at a point
+     * @param originPoint
+     * @param direction
+     */
     private void attachGesture (final PointF originPoint, final int direction) {
         if (previousRunnable != null) {
             detachPreviousTimer();
@@ -110,6 +154,9 @@ public class MouseEmulationEngine {
         timerHandler.postDelayed(previousRunnable, 0);
     }
 
+    /**
+     * Auto Disappear mouse after some duration and reset momentum
+     */
     private void detachPreviousTimer () {
         if (previousRunnable != null) {
             timerHandler.removeCallbacks(previousRunnable);
@@ -145,9 +192,11 @@ public class MouseEmulationEngine {
 
     public boolean perform (KeyEvent keyEvent) {
 
+        // toggle mouse mode if going via bossKey
         if (keyEvent.getKeyCode() == bossKey) {
             if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
                 if (waitToChange != null) {
+                    // cancel change countdown
                     waitToChange.cancel();
                     if (isEnabled) return true;
                 }
@@ -156,33 +205,41 @@ public class MouseEmulationEngine {
                 waitToChange();
                 if (isEnabled){
                     isInScrollMode = !isInScrollMode;
+                    Toast.makeText(mService, "Scroll Mode " + isInScrollMode, Toast.LENGTH_SHORT).show();
                     return true;
                 }
             }
         }
+        // keep full functionality on full size remotes
+        if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode() == KeyEvent.KEYCODE_INFO) {
+            if (this.isEnabled) {
+                // mouse already enabled, disable it and make it go away
+                this.isEnabled = false;
+                mPointerControl.disappear();
+                Toast.makeText(mService, "Dpad Mode", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                // mouse is disabled, enable it, reset it and show it
+                this.isEnabled = true;
+                mPointerControl.reset();
+                mPointerControl.reappear();
+                Toast.makeText(mService, "Mouse/Scroll", Toast.LENGTH_SHORT).show();
+            }
+        }
+
         if (!isEnabled) {
+            // mouse is disabled, don't do anything and let the system consume this event
             return false;
         }
         boolean consumed = false;
         if (keyEvent.getAction() == KeyEvent.ACTION_DOWN){
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                if (isInScrollMode) attachGesture(mPointerControl.getPointerLocation(), PointerControl.DOWN);
-                else attachTimer(PointerControl.UP);
-                consumed = true;
-            }
-            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
-                if (isInScrollMode) attachGesture(mPointerControl.getPointerLocation(), PointerControl.UP);
-                else attachTimer(PointerControl.DOWN);
-                consumed = true;
-            }
-            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
-                if (isInScrollMode) attachGesture(mPointerControl.getPointerLocation(), PointerControl.RIGHT);
-                else attachTimer(PointerControl.LEFT);
-                consumed = true;
-            }
-            else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                if (isInScrollMode) attachGesture(mPointerControl.getPointerLocation(), PointerControl.LEFT);
-                else attachTimer(PointerControl.RIGHT);
+            if (scrollCodeMap.containsKey(keyEvent.getKeyCode())) {
+                if (isInScrollMode || colorSet.contains(keyEvent.getKeyCode())) {
+                    attachGesture(mPointerControl.getPointerLocation(), scrollCodeMap.get(keyEvent.getKeyCode()));
+                }
+                else if (movementCodeMap.containsKey(keyEvent.getKeyCode())){
+                    attachTimer(movementCodeMap.get(keyEvent.getKeyCode()));
+                }
                 consumed = true;
             }
             else if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
@@ -191,10 +248,9 @@ public class MouseEmulationEngine {
             }
         }
         else if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
-            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
-                    || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN
-                    || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT
-                    || keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT
+            // key released, cancel any ongoing effects and clean-up
+            // since bossKey is also now a part of this stuff, consume it if events enabled
+            if (actionableKeyMap.contains(keyEvent.getKeyCode())
                     || keyEvent.getKeyCode() == bossKey) {
                 detachPreviousTimer();
                 consumed = true;
@@ -202,6 +258,7 @@ public class MouseEmulationEngine {
             else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
                 detachPreviousTimer();
                 if (keyEvent.getEventTime() - keyEvent.getDownTime() > 500) {
+                    // unreliable long click event if button was pressed for more than 500 ms
                     int action = AccessibilityNodeInfo.ACTION_LONG_CLICK;
                     Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
                     AccessibilityNodeInfo hitNode = findNode(null, action, pInt);
@@ -221,20 +278,26 @@ public class MouseEmulationEngine {
         return consumed;
     }
 
-    private void setMouseModeEnabled(boolean enable) { if (enable) {
-        // Enable Mouse Mode
-        this.isEnabled = true;
-        isInScrollMode = false;
-        mPointerControl.reset();
-        mPointerControl.reappear();
-        Toast.makeText(mService, "Mouse Mode", Toast.LENGTH_SHORT).show();
-    } else {
-        //Disable Mouse Mode
-        this.isEnabled = false;
-        mPointerControl.disappear();
-        Toast.makeText(mService, "D-Pad Mode", Toast.LENGTH_SHORT).show();
-    } }
+    private void setMouseModeEnabled(boolean enable) {
+        if (enable) {
+            // Enable Mouse Mode
+            this.isEnabled = true;
+            isInScrollMode = false;
+            mPointerControl.reset();
+            mPointerControl.reappear();
+            Toast.makeText(mService, "Mouse Mode", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            // Disable Mouse Mode
+            this.isEnabled = false;
+            mPointerControl.disappear();
+            Toast.makeText(mService, "D-Pad Mode", Toast.LENGTH_SHORT).show();
+        }
+    }
 
+    /**
+     * Simple count down timer for checking keypress duration
+     */
     private void waitToChange() {
         waitToChange = new CountDownTimer(800, 800) {
             @Override
@@ -246,6 +309,11 @@ public class MouseEmulationEngine {
         };
         waitToChange.start();
     }
+
+    //// below code is for supporting legacy devices as per my understanding of evia face cam source
+    //// this is only used for long clicks here and isn't exactly something reliable
+    //// leaving it in for reference just in case needed in future, because looking up face cam
+    //// app's source might be a daunting task
 
     private AccessibilityNodeInfo findNode (AccessibilityNodeInfo node, int action, Point pInt) {
         if (node == null) {
@@ -283,4 +351,25 @@ public class MouseEmulationEngine {
         }
         return result;
     }
+
+    /** Not used
+     * Letting this stay here just in case the code needs porting back to an obsolete version
+     * sometime in future
+     //    private void attachActionable (final int action, final AccessibilityNodeInfo node) {
+     //        if (previousRunnable != null) {
+     //            detachPreviousTimer();
+     //        }
+     //        previousRunnable = new Runnable() {
+     //            @Override
+     //            public void run() {
+     //                mPointerControl.reappear();
+     //                node.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+     //                node.performAction(action);
+     //                node.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
+     //                timerHandler.postDelayed(this, 30);
+     //            }
+     //        };
+     //        timerHandler.postDelayed(previousRunnable, 0);
+     //    }
+     **/
 }

@@ -2,18 +2,29 @@ package io.github.virresh.matvt.gui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.Settings;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import io.github.virresh.matvt.R;
 import io.github.virresh.matvt.helper.Helper;
@@ -28,6 +39,9 @@ public class GuiActivity extends AppCompatActivity {
     EditText et_override;
     Button bt_override;
     LinearLayout boss_override;
+
+    Spinner sp_mouse_icon;
+    SeekBar dsbar_mouse_size;
 
     public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 701;
     public static int ACTION_ACCESSIBILITY_PERMISSION_REQUEST_CODE = 702;
@@ -44,7 +58,14 @@ public class GuiActivity extends AppCompatActivity {
         bt_override = findViewById(R.id.bt_override);
         et_override = findViewById(R.id.et_override);
         cb_override = findViewById(R.id.cb_override);
-        checkValues();
+        sp_mouse_icon = findViewById(R.id.sp_mouse_icon);
+        dsbar_mouse_size = findViewById(R.id.dsbar_mouse_size);
+
+        // render icon style dropdown
+        IconStyleSpinnerAdapter iconStyleSpinnerAdapter = new IconStyleSpinnerAdapter(this, R.layout.spinner_icon_text_gui, R.id.textView, IconStyleSpinnerAdapter.getResourceList());
+        sp_mouse_icon.setAdapter(iconStyleSpinnerAdapter);
+
+        checkValues(iconStyleSpinnerAdapter);
         showBossLayout(cb_override.isChecked());
         cb_override.setOnCheckedChangeListener((compoundButton, b) -> {
             showBossLayout(b);
@@ -53,7 +74,7 @@ public class GuiActivity extends AppCompatActivity {
         bt_override.setOnClickListener(view -> {
             String dat = et_override.getText().toString();
             dat = dat.replaceAll("[^0-9]", "");
-            int keyValue; if (dat.isEmpty()) keyValue = 164;
+            int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_VOLUME_MUTE;
             else keyValue = Integer.parseInt(dat);
             Helper.setOverrideStatus(this, cb_override.isChecked());
             Helper.setOverrideValue(this, keyValue);
@@ -61,18 +82,54 @@ public class GuiActivity extends AppCompatActivity {
             Toast.makeText(this, "New key is : "+keyValue, Toast.LENGTH_SHORT).show();
         });
 
+        sp_mouse_icon.setOnItemSelectedListener(new OnItemSelectedListener() {
+            // the listener is set after setting initial value to avoid echo if any
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+                Context ctx = getApplicationContext();
+                String style = iconStyleSpinnerAdapter.getItem(pos);
+                Helper.setMouseIconPref(ctx, iconStyleSpinnerAdapter.getItem(pos));
+//                Toast.makeText(ctx, "Icon style set to "+style+". Changes will take effect from next restart.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
+
+        dsbar_mouse_size.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    // do not do anything if the progress change was done programmatically
+                    Context ctx = getApplicationContext();
+                    Helper.setMouseSizePref(ctx, progress);
+//                    Toast.makeText(ctx, "Mouse size set. Changes will take effect from next restart.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
         populateText();
         findViewById(R.id.gui_setup_perm).setOnClickListener(view -> askPermissions());
     }
 
-    private void checkValues() {
+    private void checkValues(IconStyleSpinnerAdapter adapter) {
         Context ctx = getApplicationContext();
         String val = String.valueOf(Helper.getOverrideValue(ctx));
-        Helper.isOverriding(getApplicationContext());
         if (Helper.isOverriding(ctx)) {
             cb_override.setChecked(true);
             et_override.setText(val);
         }
+        String iconStyle = Helper.getMouseIconPref(ctx);
+        sp_mouse_icon.setSelection(adapter.getPosition(iconStyle));
+
+        int mouseSize = Helper.getMouseSizePref(ctx);
+        dsbar_mouse_size.setProgress(Math.max(Math.min(mouseSize, 4), 0));
     }
 
     private void showBossLayout(boolean status) {
@@ -84,7 +141,8 @@ public class GuiActivity extends AppCompatActivity {
     private void askPermissions() {
         if (Helper.isOverlayDisabled(this)) {
             try {
-                startActivityForResult(new Intent("android.settings.action.MANAGE_OVERLAY_PERMISSION"), ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
+                startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION),
+                        ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
             } catch (Exception unused) {
                 Toast.makeText(this, "Overlay Permission Handler not Found", Toast.LENGTH_SHORT).show();
             }

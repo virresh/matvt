@@ -9,6 +9,8 @@
     <string name="serv_acc_denied">Accessibility Service : Not Running</string>
     <string name="serv_overlay_allowed">Overlay Service : Running</string>
     <string name="serv_overlay_denied">Overlay Service : Not Running</string>
-
-
+    <string-array name="mouse_style_arr">
+        <item>Dark (default)</item>
+        <item>Light</item>
+    </string-array>
 </resources>

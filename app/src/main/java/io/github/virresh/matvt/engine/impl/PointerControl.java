@@ -42,6 +42,7 @@ public class PointerControl {
      * Reset pointer location by centering it
      */
     public void reset () {
+        mCursorView.updateFromPreferences();
         mPointerLocation.x = mPointerLayerView.getWidth() / 2f;
         mPointerLocation.y = mPointerLayerView.getHeight() / 2f;
         Log.i(LOG_TAG, "View W, H: " + mPointerLayerView.getWidth() + " " + mPointerLayerView.getHeight());

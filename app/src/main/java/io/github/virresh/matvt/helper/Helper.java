@@ -15,6 +15,8 @@ public class Helper {
     static final String PREFS_ID = "MATVT";
     static final String PREF_KEY_CB_OVERRIDE_STAT = "CB_OVERRIDE_STAT";
     static final String PREF_KEY_CB_OVERRIDE_VAL = "CB_OVERRIDE_VAL";
+    static final String PREF_KEY_MOUSE_ICON = "MOUSE_ICON";
+    static final String PREF_KEY_MOUSE_SIZE = "MOUSE_SIZE";
 
     public static boolean isAccessibilityDisabled(Context ctx) {
         return !isAccServiceInstalled(ctx.getPackageName() + "/.services.MouseEventService", ctx);
@@ -68,5 +70,30 @@ public class Helper {
         editor.commit();
     }
 
+    public static String getMouseIconPref(Context ctx) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.getString(PREF_KEY_MOUSE_ICON, "default");
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void setMouseIconPref(Context ctx, String val) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(PREF_KEY_MOUSE_ICON, val);
+        editor.commit();
+    }
+
+    public static int getMouseSizePref(Context ctx) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.getInt(PREF_KEY_MOUSE_SIZE, 1);
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void setMouseSizePref(Context ctx, int val) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(PREF_KEY_MOUSE_SIZE, val);
+        editor.commit();
+    }
 
 }

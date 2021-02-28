@@ -10,6 +10,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 
 import io.github.virresh.matvt.R;
+import io.github.virresh.matvt.gui.IconStyleSpinnerAdapter;
+import io.github.virresh.matvt.helper.Helper;
 
 /**
  * Draw a Mouse Cursor on screen
@@ -20,6 +22,8 @@ public class MouseCursorView extends View {
     private final PointF mPointerLocation;
     private final Paint mPaintBox;
     private final Bitmap mPointerBitmap;
+    private int pointerDrawableReference;
+    private int pointerSizeReference;
 
     public MouseCursorView(Context context) {
         super(context);
@@ -27,11 +31,19 @@ public class MouseCursorView extends View {
         mPointerLocation = new PointF();
         mPaintBox = new Paint();
 
+        updateFromPreferences();
+
         @SuppressLint("UseCompatLoadingForDrawables")
-        BitmapDrawable bp = (BitmapDrawable) getContext().getResources().getDrawable(R.drawable.pointer);
+        BitmapDrawable bp = (BitmapDrawable) context.getDrawable(pointerDrawableReference);
         Bitmap originalBitmap = bp.getBitmap();
-        BitmapDrawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(originalBitmap, 50, 50, true));
+        BitmapDrawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(originalBitmap, 50 * pointerSizeReference, 50 * pointerSizeReference, true));
         mPointerBitmap = d.getBitmap();
+    }
+
+    public void updateFromPreferences() {
+        Context ctx = getContext();
+        pointerDrawableReference = IconStyleSpinnerAdapter.textToResourceIdMap.getOrDefault(Helper.getMouseIconPref(ctx), R.drawable.pointer);
+        pointerSizeReference = Helper.getMouseSizePref(ctx) + 1;
     }
 
     @Override
