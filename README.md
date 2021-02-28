@@ -69,5 +69,5 @@ If you have gotten yourself in this situation, see FAQ.
 
 # Credits
 Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse
-Thanks to @sweenwolf for making this app work on remotes with less buttons
+Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent curson images
 Thanks to TechDoctorUK for making a demo video
