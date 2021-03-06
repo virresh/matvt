@@ -7,6 +7,7 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -98,6 +100,16 @@ public class MouseEmulationEngine {
         colorSet = Collections.unmodifiableSet(integerSet);
     }
 
+    private static final Map<Integer, Integer> legacyActionScrollMap;
+    static {
+        Map<Integer, Integer> integerMap = new HashMap<>();
+        integerMap.put(KeyEvent.KEYCODE_DPAD_DOWN, AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+        integerMap.put(KeyEvent.KEYCODE_DPAD_UP, AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+        integerMap.put(KeyEvent.KEYCODE_DPAD_RIGHT, AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_RIGHT.getId());
+        integerMap.put(KeyEvent.KEYCODE_DPAD_LEFT, AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_LEFT.getId());
+        legacyActionScrollMap = Collections.unmodifiableMap(integerMap);
+    }
+
     public MouseEmulationEngine (Context c, OverlayView ov) {
         momentumStack = 0;
         // overlay view for drawing mouse
@@ -146,7 +158,9 @@ public class MouseEmulationEngine {
             @Override
             public void run() {
                 mPointerControl.reappear();
-                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+                }
                 momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
@@ -166,6 +180,7 @@ public class MouseEmulationEngine {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private static GestureDescription createClick (PointF clickPoint) {
         final int DURATION = 1;
         Path clickPath = new Path();
@@ -177,6 +192,7 @@ public class MouseEmulationEngine {
         return clickBuilder.build();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private static GestureDescription createSwipe (PointF originPoint, int direction, int momentum) {
         final int DURATION = 10;
         Path clickPath = new Path();
@@ -188,6 +204,27 @@ public class MouseEmulationEngine {
         GestureDescription.Builder clickBuilder = new GestureDescription.Builder();
         clickBuilder.addStroke(clickStroke);
         return clickBuilder.build();
+    }
+
+    private boolean legacyPerformAction (int actionSuggestion, boolean isScroll) {
+        int action = AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK.getId();
+        if (actionSuggestion == -2) {
+            action = AccessibilityNodeInfo.AccessibilityAction.ACTION_LONG_CLICK.getId();
+        }
+        if (isScroll && legacyActionScrollMap.containsKey(actionSuggestion)) {
+            action = legacyActionScrollMap.get(actionSuggestion);
+        } else if (isScroll) {
+            // scroll mode but no action
+            return false;
+        }
+        Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
+        AccessibilityNodeInfo hitNode = findNode(null, action, pInt);
+        boolean consumed = false;
+        if (hitNode != null) {
+            hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
+            consumed = hitNode.performAction(action);
+        }
+        return consumed;
     }
 
     public boolean perform (KeyEvent keyEvent) {
@@ -235,7 +272,11 @@ public class MouseEmulationEngine {
         if (keyEvent.getAction() == KeyEvent.ACTION_DOWN){
             if (scrollCodeMap.containsKey(keyEvent.getKeyCode())) {
                 if (isInScrollMode || colorSet.contains(keyEvent.getKeyCode())) {
-                    attachGesture(mPointerControl.getPointerLocation(), scrollCodeMap.get(keyEvent.getKeyCode()));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        attachGesture(mPointerControl.getPointerLocation(), scrollCodeMap.get(keyEvent.getKeyCode()));
+                    } else {
+                        legacyPerformAction(keyEvent.getKeyCode(), true);
+                    }
                 }
                 else if (movementCodeMap.containsKey(keyEvent.getKeyCode())){
                     attachTimer(movementCodeMap.get(keyEvent.getKeyCode()));
@@ -259,18 +300,15 @@ public class MouseEmulationEngine {
                 detachPreviousTimer();
                 if (keyEvent.getEventTime() - keyEvent.getDownTime() > 500) {
                     // unreliable long click event if button was pressed for more than 500 ms
-                    int action = AccessibilityNodeInfo.ACTION_LONG_CLICK;
-                    Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
-                    AccessibilityNodeInfo hitNode = findNode(null, action, pInt);
-
-                    if (hitNode != null) {
-                        hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
-                        consumed = hitNode.performAction(action);
-                    }
+                    legacyPerformAction(-2, false);
                 }
                 else {
-                    mService.dispatchGesture(createClick(mPointerControl.getPointerLocation()), null, null);
-                    return false;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        mService.dispatchGesture(createClick(mPointerControl.getPointerLocation()), null, null);
+                        consumed = true;
+                    } else {
+                        consumed = legacyPerformAction(-1, false);
+                    }
                 }
 
             }
@@ -337,10 +375,10 @@ public class MouseEmulationEngine {
         }
         AccessibilityNodeInfo result = null;
         result = node;
-//        if ((node.getActions() & action) != 0) {
-//            // possible to use this one, but keep searching children as well
-//            result = node;
-//        }
+        if ((node.getActions() & action) != 0) {
+            // possible to use this one, but keep searching children as well
+            return node;
+        }
         int childCount = node.getChildCount();
         for (int i=0; i<childCount; i++) {
             AccessibilityNodeInfo child = findNodeHelper(node.getChild(i), action, pInt);

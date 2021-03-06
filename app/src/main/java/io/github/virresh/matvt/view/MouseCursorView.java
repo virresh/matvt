@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.view.View;
 
 import io.github.virresh.matvt.R;
@@ -42,7 +43,12 @@ public class MouseCursorView extends View {
 
     public void updateFromPreferences() {
         Context ctx = getContext();
-        pointerDrawableReference = IconStyleSpinnerAdapter.textToResourceIdMap.getOrDefault(Helper.getMouseIconPref(ctx), R.drawable.pointer);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            pointerDrawableReference = IconStyleSpinnerAdapter.textToResourceIdMap.getOrDefault(Helper.getMouseIconPref(ctx), R.drawable.pointer);
+        }
+        else {
+            pointerDrawableReference = IconStyleSpinnerAdapter.textToResourceIdMap.get(Helper.getMouseIconPref(ctx));
+        }
         pointerSizeReference = Helper.getMouseSizePref(ctx) + 1;
     }
 

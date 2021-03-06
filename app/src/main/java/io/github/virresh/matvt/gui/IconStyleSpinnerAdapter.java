@@ -1,6 +1,7 @@
 package io.github.virresh.matvt.gui;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,16 @@ public class IconStyleSpinnerAdapter extends ArrayAdapter<String> {
     }
 
     public static List<String> getResourceList () {
-        return textToResourceIdMap.keySet().stream().collect(Collectors.toList());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return textToResourceIdMap.keySet().stream().collect(Collectors.toList());
+        }
+        else {
+            List<String> resList = new ArrayList<String>();
+            for (String x: textToResourceIdMap.keySet()) {
+                resList.add(x);
+            }
+            return resList;
+        }
     }
 
     @Override
@@ -74,7 +85,13 @@ public class IconStyleSpinnerAdapter extends ArrayAdapter<String> {
         String selection = objects.get(position);
 
         label.setText(selection);
-        icon.setImageDrawable(context.getDrawable(textToResourceIdMap.getOrDefault(selection, R.drawable.pointer)));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            icon.setImageDrawable(context.getDrawable(textToResourceIdMap.getOrDefault(selection, R.drawable.pointer)));
+        }
+        else {
+            // no default, can cause crashes
+            icon.setImageDrawable(context.getDrawable(textToResourceIdMap.get(selection)));
+        }
 
         if (setBackcolor) {
             label.setBackground(context.getDrawable(R.drawable.focus_selector));
