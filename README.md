@@ -27,6 +27,8 @@ After installing this app, you'll get a (*BIG*) mouse cursor that can move aroun
 left / right / up / down swipes from your remote itself without any extra hardware (no need to pair
 with an android phone / laptop etc)
 
+### UPDATE: Thanks to community contributions, now the app can be run on Android Boxes with small sized remotes as well. Checkout the how to use section for more information
+
 ## How to install?
 Download the APK from the releases section and side-load it on your TV.
 The source-code is open and available should you wish to inspect it / build it yourself / don't
