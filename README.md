@@ -44,7 +44,7 @@ trust the release apk ;)
 - The mouse warps around your TV sides, so you can roll over from the top of your TV to the bottom instantly
 - Mouse movement is momentum based, so keeping key pressed for longer will increase the movement / send multiple swipes
 - For remotes who don't have the above buttons, a `Boss Key` is available which can be used to toggle between mouse mode / scroll mode / dpad mode. By default this is the mute key, but can be overridden in the configuration settings. See the Youtube video linked below by TechDoctorUK for a demo of how that works.
-- You can change the cursor icon used from the companion GUI app. It also supports changing mouse size.
+- You can change the cursor icon used from the companion GUI app. It also supports changing mouse size / scroll speed.
 
 
 Shoutout to @sweenwolf for enhancing the app to work on tv boxes with less remote buttons.  
