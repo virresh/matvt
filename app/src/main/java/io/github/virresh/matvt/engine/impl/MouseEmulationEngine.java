@@ -12,13 +12,16 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +46,8 @@ public class MouseEmulationEngine {
     private boolean isEnabled;
 
     public static int bossKey;
+
+    public static int scrollSpeed;
 
     private Handler timerHandler;
 
@@ -178,7 +183,7 @@ public class MouseEmulationEngine {
     }
 
     private static GestureDescription createSwipe (PointF originPoint, int direction, int momentum) {
-        final int DURATION = 10;
+        final int DURATION = scrollSpeed + 8;
         Path clickPath = new Path();
         PointF lineDirection = new PointF(originPoint.x + momentum * PointerControl.dirX[direction], originPoint.y + momentum * PointerControl.dirY[direction]);
         clickPath.moveTo(originPoint.x, originPoint.y);
@@ -257,22 +262,32 @@ public class MouseEmulationEngine {
             }
             else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
                 detachPreviousTimer();
-                if (keyEvent.getEventTime() - keyEvent.getDownTime() > 500) {
+//                if (keyEvent.getEventTime() - keyEvent.getDownTime() > 500) {
                     // unreliable long click event if button was pressed for more than 500 ms
-                    int action = AccessibilityNodeInfo.ACTION_LONG_CLICK;
-                    Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
-                    AccessibilityNodeInfo hitNode = findNode(null, action, pInt);
-
-                    if (hitNode != null) {
-                        hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
-                        consumed = hitNode.performAction(action);
+                int action = AccessibilityNodeInfo.ACTION_CLICK;
+                Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
+                List<AccessibilityWindowInfo> windowList= mService.getWindows();
+                for (AccessibilityWindowInfo window : windowList) {
+                    List<AccessibilityNodeInfo> nodeHierarchy = findNode(window.getRoot(), action, pInt);
+                    for (int i=nodeHierarchy.size()-1; i>=0; i--){
+                        if (consumed) return consumed;
+                        AccessibilityNodeInfo hitNode = nodeHierarchy.get(i);
+                        List<AccessibilityNodeInfo.AccessibilityAction> availableActions = hitNode.getActionList();
+                        if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_FOCUS)){
+                            hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
+                        }
+                        if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SELECT)){
+                            hitNode.performAction(AccessibilityNodeInfo.ACTION_SELECT);
+                        }
+                        if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)){
+                            consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                        }
+                    }
+                    if (!consumed){
+                        mService.dispatchGesture(createClick(mPointerControl.getPointerLocation()), null, null);
+                        return true;
                     }
                 }
-                else {
-                    mService.dispatchGesture(createClick(mPointerControl.getPointerLocation()), null, null);
-                    return false;
-                }
-
             }
         }
         return consumed;
@@ -315,17 +330,22 @@ public class MouseEmulationEngine {
     //// leaving it in for reference just in case needed in future, because looking up face cam
     //// app's source might be a daunting task
 
-    private AccessibilityNodeInfo findNode (AccessibilityNodeInfo node, int action, Point pInt) {
+    private List<AccessibilityNodeInfo> findNode (AccessibilityNodeInfo node, int action, Point pInt) {
         if (node == null) {
             node = mService.getRootInActiveWindow();
         }
+        if (node == null) {
+            Log.i(LOG_TAG, "Root Node ======>>>>>" + ((node != null) ? node.toString() : "null"));
+        }
+        List<AccessibilityNodeInfo> nodeInfos = new ArrayList<>();
         Log.i(LOG_TAG, "Node found ?" + ((node != null) ? node.toString() : "null"));
-        node = findNodeHelper(node, action, pInt);
+        node = findNodeHelper(node, action, pInt, nodeInfos);
         Log.i(LOG_TAG, "Node found ?" + ((node != null) ? node.toString() : "null"));
-        return node;
+        Log.i(LOG_TAG, "Number of Nodes ?=>>>>> " + nodeInfos.size());
+        return nodeInfos;
     }
 
-    private AccessibilityNodeInfo findNodeHelper (AccessibilityNodeInfo node, int action, Point pInt) {
+    private AccessibilityNodeInfo findNodeHelper (AccessibilityNodeInfo node, int action, Point pInt, List<AccessibilityNodeInfo> nodeList) {
         if (node == null) {
             return null;
         }
@@ -335,15 +355,17 @@ public class MouseEmulationEngine {
             // node doesn't contain cursor
             return null;
         }
+        // node contains cursor, add to node hierarchy
+        nodeList.add(node);
         AccessibilityNodeInfo result = null;
         result = node;
-//        if ((node.getActions() & action) != 0) {
+//        if ((node.getActions() & action) != 0 && node != null) {
 //            // possible to use this one, but keep searching children as well
-//            result = node;
+//            nodeList.add(node);
 //        }
         int childCount = node.getChildCount();
         for (int i=0; i<childCount; i++) {
-            AccessibilityNodeInfo child = findNodeHelper(node.getChild(i), action, pInt);
+            AccessibilityNodeInfo child = findNodeHelper(node.getChild(i), action, pInt, nodeList);
             if (child != null) {
                 // always picks the last innermost clickable child
                 result = child;

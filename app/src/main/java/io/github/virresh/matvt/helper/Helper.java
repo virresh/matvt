@@ -17,6 +17,7 @@ public class Helper {
     static final String PREF_KEY_CB_OVERRIDE_VAL = "CB_OVERRIDE_VAL";
     static final String PREF_KEY_MOUSE_ICON = "MOUSE_ICON";
     static final String PREF_KEY_MOUSE_SIZE = "MOUSE_SIZE";
+    static final String PREF_KEY_SCROLL_SPEED = "SCROLL_SPEED";
 
     public static boolean isAccessibilityDisabled(Context ctx) {
         return !isAccServiceInstalled(ctx.getPackageName() + "/.services.MouseEventService", ctx);
@@ -95,5 +96,19 @@ public class Helper {
         editor.putInt(PREF_KEY_MOUSE_SIZE, val);
         editor.commit();
     }
+
+    public static int getScrollSpeed(Context ctx) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.getInt(PREF_KEY_SCROLL_SPEED, 4);
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void setScrollSpeed(Context ctx, int val) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(PREF_KEY_SCROLL_SPEED, val);
+        editor.commit();
+    }
+
 
 }

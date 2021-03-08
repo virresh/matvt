@@ -30,6 +30,7 @@ import io.github.virresh.matvt.R;
 import io.github.virresh.matvt.helper.Helper;
 
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
+import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpeed;
 
 public class GuiActivity extends AppCompatActivity {
     CountDownTimer repopulate;
@@ -42,6 +43,7 @@ public class GuiActivity extends AppCompatActivity {
 
     Spinner sp_mouse_icon;
     SeekBar dsbar_mouse_size;
+    SeekBar dsbar_scroll_speed;
 
     public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 701;
     public static int ACTION_ACCESSIBILITY_PERMISSION_REQUEST_CODE = 702;
@@ -60,6 +62,7 @@ public class GuiActivity extends AppCompatActivity {
         cb_override = findViewById(R.id.cb_override);
         sp_mouse_icon = findViewById(R.id.sp_mouse_icon);
         dsbar_mouse_size = findViewById(R.id.dsbar_mouse_size);
+        dsbar_scroll_speed = findViewById(R.id.dsbar_mouse_scspeed);
 
         // render icon style dropdown
         IconStyleSpinnerAdapter iconStyleSpinnerAdapter = new IconStyleSpinnerAdapter(this, R.layout.spinner_icon_text_gui, R.id.textView, IconStyleSpinnerAdapter.getResourceList());
@@ -114,6 +117,25 @@ public class GuiActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        dsbar_scroll_speed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    // do not do anything if the progress change was done programmatically
+                    Context ctx = getApplicationContext();
+                    Helper.setScrollSpeed(ctx, progress);
+                    scrollSpeed = progress;
+//                    Toast.makeText(ctx, "Mouse size set. Changes will take effect from next restart.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
         populateText();
         findViewById(R.id.gui_setup_perm).setOnClickListener(view -> askPermissions());
     }
@@ -129,7 +151,10 @@ public class GuiActivity extends AppCompatActivity {
         sp_mouse_icon.setSelection(adapter.getPosition(iconStyle));
 
         int mouseSize = Helper.getMouseSizePref(ctx);
-        dsbar_mouse_size.setProgress(Math.max(Math.min(mouseSize, 4), 0));
+        dsbar_mouse_size.setProgress(Math.max(Math.min(mouseSize, dsbar_mouse_size.getMax()), 0));
+
+        int scrollSpeed = Helper.getScrollSpeed(ctx);
+        dsbar_scroll_speed.setProgress(Math.max(Math.min(scrollSpeed, dsbar_scroll_speed.getMax()), 0));
     }
 
     private void showBossLayout(boolean status) {

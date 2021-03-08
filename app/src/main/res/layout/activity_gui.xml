@@ -96,8 +96,40 @@
             android:foregroundTint="@color/white"
             android:max="4"
             android:nextFocusUp="@id/gui_setup_perm"
-            android:nextFocusDown="@id/sp_mouse_icon"
+            android:nextFocusDown="@id/dsbar_mouse_scspeed"
             android:progress="1"
+            android:progressBackgroundTint="@color/white_2"
+            android:progressTint="@color/white"
+            android:thumbTint="@color/white"
+            android:tickMarkTint="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mouse_scroll_speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scroll Speed (Fast to Slow)"
+            android:textAlignment="textStart"
+            android:textColor="@color/white"
+            android:textSize="20.0sp" />
+
+        <SeekBar
+            android:id="@+id/dsbar_mouse_scspeed"
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:foregroundTint="@color/white"
+            android:max="20"
+            android:nextFocusUp="@id/dsbar_mouse_size"
+            android:nextFocusDown="@id/sp_mouse_icon"
+            android:progress="4"
             android:progressBackgroundTint="@color/white_2"
             android:progressTint="@color/white"
             android:thumbTint="@color/white"
@@ -128,7 +160,7 @@
             android:layout_weight="0.5"
             android:drawSelectorOnTop="true"
             android:dropDownWidth="match_parent"
-            android:nextFocusUp="@id/dsbar_mouse_size"
+            android:nextFocusUp="@id/dsbar_mouse_scspeed"
             android:nextFocusDown="@id/cb_override"
             android:spinnerMode="dropdown" />
     </LinearLayout>
