@@ -18,42 +18,60 @@
             android:textColor="#CA0000"
             android:textSize="20.0sp" />
 
-        <TextView
-            android:textColor="@color/white"
-            android:id="@+id/gui_acc_perm"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Accessibility Permission"
-            android:textAlignment="textStart"
-            android:textSize="20.0sp" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_weight="0.5"
+                android:textColor="@color/white"
+                android:id="@+id/gui_acc_perm"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Accessibility Permission"
+                android:textAlignment="textStart"
+                android:textSize="20.0sp" />
 
-        <TextView
-            android:textColor="@color/white"
-            android:id="@+id/gui_acc_serv"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Accessibility Service"
-            android:textAlignment="textStart"
-            android:textSize="20.0sp" />
+            <TextView
+                android:layout_weight="0.5"
+                android:textColor="@color/white"
+                android:id="@+id/gui_acc_serv"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Accessibility Service"
+                android:textAlignment="textStart"
+                android:textSize="20.0sp" />
+        </LinearLayout>
 
-        <TextView
-            android:textColor="@color/white"
-            android:id="@+id/gui_overlay_perm"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Overlay Permission"
-            android:textAlignment="textStart"
-            android:textSize="20.0sp" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:textColor="@color/white"
-            android:id="@+id/gui_overlay_serv"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Overlay Service"
-            android:textAlignment="textStart"
-            android:textSize="20.0sp" />
+            <TextView
+                android:layout_weight="0.50"
+                android:textColor="@color/white"
+                android:id="@+id/gui_overlay_perm"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Overlay Permission"
+                android:textAlignment="textStart"
+                android:textSize="20.0sp" />
 
+            <TextView
+                android:layout_weight="0.50"
+                android:textColor="@color/white"
+                android:id="@+id/gui_overlay_serv"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Overlay Service"
+                android:textAlignment="textStart"
+                android:textSize="20.0sp" />
+
+
+        </LinearLayout>
         <Button
             android:id="@+id/gui_setup_perm"
             android:layout_width="wrap_content"
@@ -151,7 +169,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.50"
+                android:layout_weight="0.20"
                 android:text="Mouse Icon"
                 android:textAlignment="textStart"
                 android:textColor="@color/white"
@@ -161,7 +179,7 @@
                 android:id="@+id/sp_mouse_icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.50"
+                android:layout_weight="0.80"
                 android:drawSelectorOnTop="true"
                 android:popupBackground="@drawable/focus_selector"
                 android:dropDownWidth="match_parent"

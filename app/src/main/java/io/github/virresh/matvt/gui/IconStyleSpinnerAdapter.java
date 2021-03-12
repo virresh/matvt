@@ -10,7 +10,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +25,7 @@ import io.github.virresh.matvt.R;
 // in case similar dropdowns are needed in future
 
 public class IconStyleSpinnerAdapter extends ArrayAdapter<String> {
-    private List<String> objects;
+    private final List<String> objects;
     private Context context;
     public static Map<String, Integer> textToResourceIdMap = new HashMap<String, Integer>();
 
@@ -39,7 +41,7 @@ public class IconStyleSpinnerAdapter extends ArrayAdapter<String> {
     }
 
     public static List<String> getResourceList () {
-        return textToResourceIdMap.keySet().stream().collect(Collectors.toList());
+        return new ArrayList<>(textToResourceIdMap.keySet());
     }
 
     @Override
@@ -74,12 +76,8 @@ public class IconStyleSpinnerAdapter extends ArrayAdapter<String> {
         String selection = objects.get(position);
 
         label.setText(selection);
-        icon.setImageDrawable(context.getDrawable(textToResourceIdMap.getOrDefault(selection, R.drawable.pointer)));
-
-        if (setBackcolor) {
-            label.setBackground(context.getDrawable(R.drawable.focus_selector));
-        }
-
+        textToResourceIdMap.getOrDefault(selection , R.drawable.pointer);
+        icon.setImageDrawable(ContextCompat.getDrawable(context, textToResourceIdMap.getOrDefault(selection, R.drawable.pointer)));
         return row;
     }
 }

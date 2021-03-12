@@ -18,13 +18,14 @@ public class Helper {
     static final String PREF_KEY_MOUSE_ICON = "MOUSE_ICON";
     static final String PREF_KEY_MOUSE_SIZE = "MOUSE_SIZE";
     static final String PREF_KEY_SCROLL_SPEED = "SCROLL_SPEED";
+    static final String PREF_KEY_MOUSE_BORDERED = "MOUSE_BORDERED";
 
     public static boolean isAccessibilityDisabled(Context ctx) {
         return !isAccServiceInstalled(ctx.getPackageName() + "/.services.MouseEventService", ctx);
     }
 
     public static boolean isAnotherServiceInstalled(Context ctx) {
-        String fireTVSettings = "com.wolf.firetvsettings/.HomeService";
+        String fireTVSettings = "com.wolf.firetvsettings/.main.services.HomeService";
         String buttonMapper = "flar2.homebutton/.a.i";
         return isAccServiceInstalled(fireTVSettings, ctx) || isAccServiceInstalled(buttonMapper, ctx);
     }
@@ -110,5 +111,18 @@ public class Helper {
         editor.commit();
     }
 
+
+    @SuppressLint("ApplySharedPref")
+    public static void setMouseBordered(Context ctx, Boolean val) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(PREF_KEY_MOUSE_BORDERED, val);
+        editor.commit();
+    }
+
+    public static boolean getMouseBordered(Context ctx) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.getBoolean(PREF_KEY_MOUSE_BORDERED, false);
+    }
 
 }

@@ -6,6 +6,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 
@@ -62,24 +63,46 @@ public class PointerControl {
         }
     }
 
+    public static boolean isBordered = false;
+
     public void move (int direction, int momentum) {
         int movementX = (int) (dirX[direction] * ((momentum)));
         int movementY = (int) (dirY[direction] * ((momentum)));
 
-        mPointerLocation.x += movementX;
-        if (mPointerLocation.x > mPointerLayerView.getWidth()) {
-            mPointerLocation.x -= mPointerLayerView.getWidth();
-        }
-        else if (mPointerLocation.x < 0) {
-            mPointerLocation.x += mPointerLayerView.getWidth();
+        // free mode
+        if (!isBordered) {
+            mPointerLocation.x += movementX;
+            if (mPointerLocation.x > mPointerLayerView.getWidth()) {
+                mPointerLocation.x -= mPointerLayerView.getWidth();
+            } else if (mPointerLocation.x < 0) {
+                mPointerLocation.x += mPointerLayerView.getWidth();
+            }
+
+            mPointerLocation.y += movementY;
+            if (mPointerLocation.y > mPointerLayerView.getHeight()) {
+                mPointerLocation.y -= mPointerLayerView.getHeight();
+            } else if (mPointerLocation.y < 0) {
+                mPointerLocation.y += mPointerLayerView.getHeight();
+            }
         }
 
-        mPointerLocation.y += movementY;
-        if (mPointerLocation.y > mPointerLayerView.getHeight()) {
-            mPointerLocation.y -= mPointerLayerView.getHeight();
-        }
-        else if (mPointerLocation.y < 0) {
-            mPointerLocation.y += mPointerLayerView.getHeight();
+        else {
+
+            if (mPointerLocation.x + movementX >= 0 && mPointerLocation.x + movementX <= mPointerLayerView.getWidth())
+                mPointerLocation.x += movementX;
+            else {
+                if (mPointerLocation.x < (mPointerLayerView.getWidth() / 2f))
+                    mPointerLocation.x = 0;
+                else mPointerLocation.x = mPointerLayerView.getWidth();
+            }
+
+            if (mPointerLocation.y + movementY >= 0 && mPointerLocation.y + movementY <= mPointerLayerView.getHeight())
+                mPointerLocation.y += movementY;
+            else {
+                if (mPointerLocation.y < (mPointerLayerView.getHeight() / 2f)) {
+                    mPointerLocation.y = 0;
+                } else mPointerLocation.y = mPointerLayerView.getHeight();
+            }
         }
 
         mCursorView.updatePosition(mPointerLocation);

@@ -210,7 +210,8 @@ public class MouseEmulationEngine {
                 waitToChange();
                 if (isEnabled){
                     isInScrollMode = !isInScrollMode;
-                    Toast.makeText(mService, "Scroll Mode " + isInScrollMode, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mService, isInScrollMode ? "Scroll Mode: Enabled" : "Scroll Mode: Disabled",
+                            Toast.LENGTH_SHORT).show();
                     return true;
                 }
             }

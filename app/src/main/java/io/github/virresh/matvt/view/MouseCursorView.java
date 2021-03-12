@@ -9,6 +9,8 @@ import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
+
 import io.github.virresh.matvt.R;
 import io.github.virresh.matvt.gui.IconStyleSpinnerAdapter;
 import io.github.virresh.matvt.helper.Helper;
@@ -34,13 +36,11 @@ public class MouseCursorView extends View {
         setBitmap(context);
     }
 
-    private BitmapDrawable setBitmap(Context context) {
-        @SuppressLint("UseCompatLoadingForDrawables")
-        BitmapDrawable bp = (BitmapDrawable) context.getDrawable(pointerDrawableReference);
+    private void setBitmap(Context context) {
+        BitmapDrawable bp = (BitmapDrawable) ContextCompat.getDrawable(context, pointerDrawableReference);
         Bitmap originalBitmap = bp.getBitmap();
         BitmapDrawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(originalBitmap, 50 * pointerSizeReference, 50 * pointerSizeReference, true));
         mPointerBitmap = d.getBitmap();
-        return d;
     }
 
     public void updateFromPreferences() {
