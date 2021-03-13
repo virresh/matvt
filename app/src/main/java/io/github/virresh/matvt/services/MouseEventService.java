@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
+import io.github.virresh.matvt.engine.impl.PointerControl;
 import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.view.OverlayView;
 
@@ -40,6 +41,7 @@ public class MouseEventService extends AccessibilityService {
     protected void onServiceConnected() {
         super.onServiceConnected();
         bossKey = KeyEvent.KEYCODE_VOLUME_MUTE;
+        PointerControl.isBordered = Helper.getMouseBordered(this);
         scrollSpeed = Helper.getScrollSpeed(this);
         if (Helper.isOverriding(this)) bossKey = Helper.getOverrideValue(this);
         if (Settings.canDrawOverlays(this)) init();

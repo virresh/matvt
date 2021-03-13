@@ -13,6 +13,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -27,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.github.virresh.matvt.R;
+import io.github.virresh.matvt.engine.impl.PointerControl;
 import io.github.virresh.matvt.helper.Helper;
 
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
@@ -34,7 +36,7 @@ import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpe
 
 public class GuiActivity extends AppCompatActivity {
     CountDownTimer repopulate;
-    CheckBox cb_override;
+    CheckBox cb_override, cb_mouse_bordered;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv;
 
     EditText et_override;
@@ -60,6 +62,7 @@ public class GuiActivity extends AppCompatActivity {
         bt_override = findViewById(R.id.bt_override);
         et_override = findViewById(R.id.et_override);
         cb_override = findViewById(R.id.cb_override);
+        cb_mouse_bordered = findViewById(R.id.cb_border_window);
         sp_mouse_icon = findViewById(R.id.sp_mouse_icon);
         dsbar_mouse_size = findViewById(R.id.dsbar_mouse_size);
         dsbar_scroll_speed = findViewById(R.id.dsbar_mouse_scspeed);
@@ -136,6 +139,11 @@ public class GuiActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        cb_mouse_bordered.setOnCheckedChangeListener((compoundButton, b) -> {
+            Helper.setMouseBordered(getApplicationContext(), b);
+            PointerControl.isBordered = b;
+        });
+
         populateText();
         findViewById(R.id.gui_setup_perm).setOnClickListener(view -> askPermissions());
     }
@@ -159,9 +167,8 @@ public class GuiActivity extends AppCompatActivity {
 
     private void showBossLayout(boolean status) {
         if (status) boss_override.setVisibility(View.VISIBLE);
-        else boss_override.setVisibility(View.INVISIBLE);
+        else boss_override.setVisibility(View.GONE);
     }
-
 
     private void askPermissions() {
         if (Helper.isOverlayDisabled(this)) {
