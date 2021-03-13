@@ -189,7 +189,6 @@
         </LinearLayout>
 
         <CheckBox
-            android:nextFocusUp="@id/sp_mouse_icon"
             android:id="@+id/cb_border_window"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -197,6 +196,18 @@
             android:buttonTint="@color/white"
             android:layoutDirection="rtl"
             android:text="Bordered Window"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <CheckBox
+            android:id="@+id/cb_disable_bossKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:buttonTint="@color/white"
+            android:layoutDirection="rtl"
+            android:nextFocusUp="@id/cb_border_window"
+            android:text="Disable Boss Key (useful for full size remotes)"
             android:textColor="@color/white"
             android:textSize="20sp" />
 

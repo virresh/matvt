@@ -19,6 +19,7 @@ public class Helper {
     static final String PREF_KEY_MOUSE_SIZE = "MOUSE_SIZE";
     static final String PREF_KEY_SCROLL_SPEED = "SCROLL_SPEED";
     static final String PREF_KEY_MOUSE_BORDERED = "MOUSE_BORDERED";
+    static final String PREF_KEY_CB_DISABLE_BOSSKEY = "DISABLE_BOSSKEY";
 
     public static boolean isAccessibilityDisabled(Context ctx) {
         return !isAccServiceInstalled(ctx.getPackageName() + "/.services.MouseEventService", ctx);
@@ -123,6 +124,19 @@ public class Helper {
     public static boolean getMouseBordered(Context ctx) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
         return sp.getBoolean(PREF_KEY_MOUSE_BORDERED, false);
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void setBossKeyDisabled(Context ctx, Boolean val) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(PREF_KEY_CB_DISABLE_BOSSKEY, val);
+        editor.commit();
+    }
+
+    public static boolean isBossKeyDisabled(Context ctx) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.getBoolean(PREF_KEY_CB_DISABLE_BOSSKEY, false);
     }
 
 }

@@ -43,6 +43,7 @@ public class MouseEventService extends AccessibilityService {
         bossKey = KeyEvent.KEYCODE_VOLUME_MUTE;
         PointerControl.isBordered = Helper.getMouseBordered(this);
         scrollSpeed = Helper.getScrollSpeed(this);
+        MouseEmulationEngine.isBossKeyDisabled = Helper.isBossKeyDisabled(this);
         if (Helper.isOverriding(this)) bossKey = Helper.getOverrideValue(this);
         if (Settings.canDrawOverlays(this)) init();
     }

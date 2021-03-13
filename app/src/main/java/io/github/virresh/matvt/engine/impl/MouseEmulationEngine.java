@@ -49,6 +49,8 @@ public class MouseEmulationEngine {
 
     public static int scrollSpeed;
 
+    public static boolean isBossKeyDisabled;
+
     private Handler timerHandler;
 
     private Runnable previousRunnable;
@@ -199,7 +201,7 @@ public class MouseEmulationEngine {
     public boolean perform (KeyEvent keyEvent) {
 
         // toggle mouse mode if going via bossKey
-        if (keyEvent.getKeyCode() == bossKey) {
+        if (keyEvent.getKeyCode() == bossKey && !isBossKeyDisabled) {
             if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
                 if (waitToChange != null) {
                     // cancel change countdown
@@ -216,6 +218,10 @@ public class MouseEmulationEngine {
                     return true;
                 }
             }
+        }
+        else if (keyEvent.getKeyCode() == bossKey) {
+            // bossKey is set to disabled, let system do it's thing
+            return false;
         }
         // keep full functionality on full size remotes
         if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode() == KeyEvent.KEYCODE_INFO) {
@@ -269,18 +275,20 @@ public class MouseEmulationEngine {
                 int action = AccessibilityNodeInfo.ACTION_CLICK;
                 Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
                 List<AccessibilityWindowInfo> windowList= mService.getWindows();
-                boolean wasIME = false;
+                boolean wasIME = false, focused = false;
                 for (AccessibilityWindowInfo window : windowList) {
                     if (consumed || wasIME) {
                         break;
                     }
                     List<AccessibilityNodeInfo> nodeHierarchy = findNode(window.getRoot(), action, pInt);
                     for (int i=nodeHierarchy.size()-1; i>=0; i--){
-                        if (consumed) return consumed;
+                        if (consumed || focused) {
+                            break;
+                        };
                         AccessibilityNodeInfo hitNode = nodeHierarchy.get(i);
                         List<AccessibilityNodeInfo.AccessibilityAction> availableActions = hitNode.getActionList();
-                        if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_FOCUS)){
-                            hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
+                        if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_ACCESSIBILITY_FOCUS)){
+                            focused = hitNode.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
                         }
 //                        if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SELECT)){
 //                            hitNode.performAction(AccessibilityNodeInfo.ACTION_SELECT);
@@ -294,12 +302,16 @@ public class MouseEmulationEngine {
                             break;
                         }
 
-                        if (hitNode.getPackageName().equals("com.google.android.tvlauncher") && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)) {
+                        if ((hitNode.getPackageName().equals("com.google.android.tvlauncher")
+                                && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK))) {
+                            if (hitNode.isFocusable()) {
+                                focused = hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
+                            }
                             consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                         }
                     }
                 }
-                if (!consumed || !wasIME) {
+                if (!consumed && !wasIME) {
                     mService.dispatchGesture(createClick(mPointerControl.getPointerLocation(), keyEvent.getEventTime() - keyEvent.getDownTime()), null, null);
                 }
             }

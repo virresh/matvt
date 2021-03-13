@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.github.virresh.matvt.R;
+import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
 import io.github.virresh.matvt.engine.impl.PointerControl;
 import io.github.virresh.matvt.helper.Helper;
 
@@ -36,7 +37,7 @@ import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpe
 
 public class GuiActivity extends AppCompatActivity {
     CountDownTimer repopulate;
-    CheckBox cb_override, cb_mouse_bordered;
+    CheckBox cb_override, cb_mouse_bordered, cb_disable_bossKey;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv;
 
     EditText et_override;
@@ -63,6 +64,7 @@ public class GuiActivity extends AppCompatActivity {
         et_override = findViewById(R.id.et_override);
         cb_override = findViewById(R.id.cb_override);
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
+        cb_disable_bossKey = findViewById(R.id.cb_disable_bossKey);
         sp_mouse_icon = findViewById(R.id.sp_mouse_icon);
         dsbar_mouse_size = findViewById(R.id.dsbar_mouse_size);
         dsbar_scroll_speed = findViewById(R.id.dsbar_mouse_scspeed);
@@ -144,6 +146,11 @@ public class GuiActivity extends AppCompatActivity {
             PointerControl.isBordered = b;
         });
 
+        cb_disable_bossKey.setOnCheckedChangeListener(((compoundButton, value) -> {
+            Helper.setBossKeyDisabled(getApplicationContext(), value);
+            MouseEmulationEngine.isBossKeyDisabled = value;
+        }));
+
         populateText();
         findViewById(R.id.gui_setup_perm).setOnClickListener(view -> askPermissions());
     }
@@ -163,6 +170,12 @@ public class GuiActivity extends AppCompatActivity {
 
         int scrollSpeed = Helper.getScrollSpeed(ctx);
         dsbar_scroll_speed.setProgress(Math.max(Math.min(scrollSpeed, dsbar_scroll_speed.getMax()), 0));
+
+        boolean bordered = Helper.getMouseBordered(ctx);
+        cb_mouse_bordered.setChecked(bordered);
+
+        boolean bossKeyStatus = Helper.isBossKeyDisabled(ctx);
+        cb_disable_bossKey.setChecked(bossKeyStatus);
     }
 
     private void showBossLayout(boolean status) {
