@@ -139,7 +139,7 @@ public class MouseEmulationEngine {
     /**
      * Send input via Android's gestureAPI
      * Only sends swipes
-     * see {@link MouseEmulationEngine#createClick(PointF)} for clicking at a point
+     * see {@link MouseEmulationEngine#createClick(PointF, long)} for clicking at a point
      * @param originPoint
      * @param direction
      */
@@ -171,8 +171,9 @@ public class MouseEmulationEngine {
         }
     }
 
-    private static GestureDescription createClick (PointF clickPoint) {
-        final int DURATION = 1;
+    private static GestureDescription createClick (PointF clickPoint, long duration) {
+        final int DURATION = 1 + (int) duration;
+        Log.i(LOG_TAG, "Actual Duration used -- " + DURATION);
         Path clickPath = new Path();
         clickPath.moveTo(clickPoint.x, clickPoint.y);
         GestureDescription.StrokeDescription clickStroke =
@@ -267,7 +268,11 @@ public class MouseEmulationEngine {
                 int action = AccessibilityNodeInfo.ACTION_CLICK;
                 Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
                 List<AccessibilityWindowInfo> windowList= mService.getWindows();
+                boolean wasIME = false;
                 for (AccessibilityWindowInfo window : windowList) {
+                    if (consumed || wasIME) {
+                        break;
+                    }
                     List<AccessibilityNodeInfo> nodeHierarchy = findNode(window.getRoot(), action, pInt);
                     for (int i=nodeHierarchy.size()-1; i>=0; i--){
                         if (consumed) return consumed;
@@ -276,17 +281,25 @@ public class MouseEmulationEngine {
                         if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_FOCUS)){
                             hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
                         }
-                        if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SELECT)){
-                            hitNode.performAction(AccessibilityNodeInfo.ACTION_SELECT);
+//                        if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SELECT)){
+//                            hitNode.performAction(AccessibilityNodeInfo.ACTION_SELECT);
+//                        }
+//                        if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)){
+//                            consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+//                        }
+                        if (window.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
+                            wasIME = true;
+                            consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                            break;
                         }
-                        if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)){
+
+                        if (hitNode.getPackageName().equals("com.google.android.tvlauncher") && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)) {
                             consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                         }
                     }
-                    if (!consumed){
-                        mService.dispatchGesture(createClick(mPointerControl.getPointerLocation()), null, null);
-                        return true;
-                    }
+                }
+                if (!consumed || !wasIME) {
+                    mService.dispatchGesture(createClick(mPointerControl.getPointerLocation(), keyEvent.getEventTime() - keyEvent.getDownTime()), null, null);
                 }
             }
         }
