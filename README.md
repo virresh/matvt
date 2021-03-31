@@ -34,7 +34,8 @@ Run the following adb commands
   adb shell appops set com.android.cts.appsflipcursor SYSTEM_ALERT_WINDOW allow
   adb shell settings put secure accessibility_enabled 1
   adb shell settings put secure enabled_accessibility_services com.android.cts.appsflipcursor/com.android.cts.appsflipcursor.services.MouseEventService
-  adb shell am startservice com.android.cts.appsflipcursor/com.android.cts.appsflipcursor.services.MouseEventService```
+  adb shell am startservice com.android.cts.appsflipcursor/com.android.cts.appsflipcursor.services.MouseEventService
+  ```
 
 ## How to use?
 - DPAD is for movement and single clicks (I think I added long click support too, but isn't very reliable)
