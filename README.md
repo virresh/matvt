@@ -31,10 +31,10 @@ trust the release apk ;)
 Run the following adb commands
 
   ```adb shell pm uninstall -k --user 0 com.lge.voicecommand
-  adb shell appops set com.android.cts.appsflipcursor SYSTEM_ALERT_WINDOW allow
+  adb shell appops set io.github.virresh.matvt SYSTEM_ALERT_WINDOW allow
   adb shell settings put secure accessibility_enabled 1
-  adb shell settings put secure enabled_accessibility_services com.android.cts.appsflipcursor/com.android.cts.appsflipcursor.services.MouseEventService
-  adb shell am startservice com.android.cts.appsflipcursor/com.android.cts.appsflipcursor.services.MouseEventService
+  adb shell settings put secure enabled_accessibility_services io.github.virresh.matvt/io.github.virresh.matvt.services.MouseEventService
+  adb shell am startservice io.github.virresh.matvt/io.github.virresh.matvt.services.MouseEventService
   ```
 
 ## How to use?
@@ -83,3 +83,4 @@ If you have gotten yourself in this situation, see FAQ.
 Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse 
 Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent curson images  
 Thanks to TechDoctorUK for making a demo video  
+Thanks to @greatjack1 for making getting this app to flipphones
