@@ -26,6 +26,17 @@ Download the APK from the releases section and side-load it on your TV.
 The source-code is open and available should you wish to inspect it / build it yourself / don't
 trust the release apk ;)
 
+## To activate this on android phone lacking the accessibility settings screen such as flip phones
+
+Run the following adb commands
+
+  ```adb shell pm uninstall -k --user 0 com.lge.voicecommand
+  adb shell appops set com.android.cts.appsflipcursor SYSTEM_ALERT_WINDOW allow
+  adb shell settings put secure accessibility_enabled 1
+  adb shell settings put secure enabled_accessibility_services com.android.cts.appsflipcursor/com.android.cts.appsflipcursor.services.MouseEventService
+  adb shell am startservice com.android.cts.appsflipcursor/com.android.cts.appsflipcursor.services.MouseEventService
+  ```
+
 ## How to use?
 - DPAD is for movement and single clicks (I think I added long click support too, but isn't very reliable)
 - The color buttons are for swiping. RED and GREEN for up/down swipe, YELLOW and BLUE for left/right swipe
