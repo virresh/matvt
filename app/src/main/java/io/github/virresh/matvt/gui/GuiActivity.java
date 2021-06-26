@@ -2,7 +2,6 @@ package io.github.virresh.matvt.gui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.Settings;
@@ -10,10 +9,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -23,9 +20,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import io.github.virresh.matvt.BuildConfig;
 
 import io.github.virresh.matvt.R;
 import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
@@ -37,8 +32,8 @@ import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpe
 
 public class GuiActivity extends AppCompatActivity {
     CountDownTimer repopulate;
-    CheckBox cb_override, cb_mouse_bordered, cb_disable_bossKey;
-    TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv;
+    CheckBox cb_override, cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
+    TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
 
     EditText et_override;
     Button bt_override;
@@ -59,15 +54,24 @@ public class GuiActivity extends AppCompatActivity {
         gui_acc_serv = findViewById(R.id.gui_acc_serv);
         gui_overlay_perm = findViewById(R.id.gui_overlay_perm);
         gui_overlay_serv = findViewById(R.id.gui_overlay_serv);
+        gui_about = findViewById(R.id.gui_about);
         boss_override = findViewById(R.id.boss_override);
+
         bt_override = findViewById(R.id.bt_override);
         et_override = findViewById(R.id.et_override);
         cb_override = findViewById(R.id.cb_override);
+
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
         cb_disable_bossKey = findViewById(R.id.cb_disable_bossKey);
+        cb_behaviour_bossKey = findViewById(R.id.cb_behaviour_bossKey);
+
         sp_mouse_icon = findViewById(R.id.sp_mouse_icon);
         dsbar_mouse_size = findViewById(R.id.dsbar_mouse_size);
         dsbar_scroll_speed = findViewById(R.id.dsbar_mouse_scspeed);
+
+        // don't like to advertise in the product, but need to mention here
+        // need to increase visibility of the open source version
+        gui_about.setText("MATVT v" + BuildConfig.VERSION_NAME + "\nThis is an open source project. It's available for free and will always be. If you find issues / would like to help in improving this project, please contribute at \nhttps://github.com/virresh/matvt");
 
         // render icon style dropdown
         IconStyleSpinnerAdapter iconStyleSpinnerAdapter = new IconStyleSpinnerAdapter(this, R.layout.spinner_icon_text_gui, R.id.textView, IconStyleSpinnerAdapter.getResourceList());
@@ -151,6 +155,11 @@ public class GuiActivity extends AppCompatActivity {
             MouseEmulationEngine.isBossKeyDisabled = value;
         }));
 
+        cb_behaviour_bossKey.setOnCheckedChangeListener((((compoundButton, value) -> {
+            Helper.setBossKeyBehaviour(getApplicationContext(), value);
+            MouseEmulationEngine.isBossKeySetToToggle = value;
+        })));
+
         populateText();
         findViewById(R.id.gui_setup_perm).setOnClickListener(view -> askPermissions());
     }
@@ -176,6 +185,9 @@ public class GuiActivity extends AppCompatActivity {
 
         boolean bossKeyStatus = Helper.isBossKeyDisabled(ctx);
         cb_disable_bossKey.setChecked(bossKeyStatus);
+
+        boolean bossKeyBehaviour = Helper.isBossKeySetToToggle(ctx);
+        cb_behaviour_bossKey.setChecked(bossKeyBehaviour);
     }
 
     private void showBossLayout(boolean status) {

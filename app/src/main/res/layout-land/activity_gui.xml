@@ -86,6 +86,19 @@
             android:textColor="@color/white" />
 
         <TextView
+            android:id="@+id/gui_about"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:autoLink="web"
+            android:fontFamily="monospace"
+            android:linksClickable="true"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="20.0sp" />
+
+
+        <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20.0dip"
@@ -212,12 +225,25 @@
             android:textSize="20sp" />
 
         <CheckBox
+            android:id="@+id/cb_behaviour_bossKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:buttonTint="@color/white"
+            android:layoutDirection="rtl"
+            android:nextFocusUp="@id/cb_border_window"
+            android:text="Will Boss Key Toggle? (default is long press)"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <CheckBox
             android:id="@+id/cb_override"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:buttonTint="@color/white"
             android:layoutDirection="rtl"
+            android:nextFocusDown="@id/et_override"
             android:text="Override Activation Key"
             android:textColor="@color/white"
             android:textSize="20sp" />
@@ -230,16 +256,17 @@
             android:layout_height="wrap_content">
 
             <EditText
-                android:inputType="number"
-                android:hint="(Default: 164)"
                 android:id="@+id/et_override"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.20"
-                android:textColorHint="@color/white_2"
                 android:buttonTint="@color/white"
+                android:hint="(Default: 164)"
+                android:inputType="number"
+                android:nextFocusRight="@id/bt_override"
                 android:textColor="@color/white"
+                android:textColorHint="@color/white_2"
                 android:textSize="20sp" />
 
             <Button
@@ -249,6 +276,7 @@
                 android:layout_weight="0.80"
                 android:background="@drawable/bg_button"
                 android:buttonTint="@color/white"
+                android:nextFocusLeft="@id/et_override"
                 android:nextFocusUp="@id/cb_override"
                 android:text="SAVE"
                 android:textColor="@color/white"

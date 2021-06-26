@@ -34,6 +34,8 @@ public class MouseEmulationEngine {
 
     CountDownTimer waitToChange;
 
+    CountDownTimer disappearTimer;
+
     private boolean isInScrollMode = false;
 
     // service which started this engine
@@ -50,6 +52,8 @@ public class MouseEmulationEngine {
     public static int scrollSpeed;
 
     public static boolean isBossKeyDisabled;
+
+    public static boolean isBossKeySetToToggle;
 
     private Handler timerHandler;
 
@@ -165,11 +169,22 @@ public class MouseEmulationEngine {
      * Auto Disappear mouse after some duration and reset momentum
      */
     private void detachPreviousTimer () {
+        if (disappearTimer != null) {
+            disappearTimer.cancel();
+        }
         if (previousRunnable != null) {
             timerHandler.removeCallbacks(previousRunnable);
-            previousRunnable = mPointerControl::disappear;
-            timerHandler.postDelayed(previousRunnable, 30000);
             momentumStack = 0;
+            disappearTimer = new CountDownTimer(10000, 10000) {
+                @Override
+                public void onTick(long l) { }
+
+                @Override
+                public void onFinish() {
+                    mPointerControl.disappear();
+                }
+            };
+            disappearTimer.start();
         }
     }
 
@@ -201,7 +216,7 @@ public class MouseEmulationEngine {
     public boolean perform (KeyEvent keyEvent) {
 
         // toggle mouse mode if going via bossKey
-        if (keyEvent.getKeyCode() == bossKey && !isBossKeyDisabled) {
+        if (keyEvent.getKeyCode() == bossKey && !isBossKeyDisabled && !isBossKeySetToToggle) {
             if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
                 if (waitToChange != null) {
                     // cancel change countdown
@@ -219,7 +234,27 @@ public class MouseEmulationEngine {
                 }
             }
         }
-        else if (keyEvent.getKeyCode() == bossKey) {
+        else if (keyEvent.getKeyCode() == bossKey && !isBossKeyDisabled && isBossKeySetToToggle) {
+            // keep a three way toggle. Dpad Mode -> Mouse Mode -> Scroll Mode -> Dpad Mode
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                if (isEnabled && isInScrollMode) {
+                    // Scroll Mode -> Dpad mode
+                    setMouseModeEnabled(false);
+                    isInScrollMode = false;
+                } else if (isEnabled && !isInScrollMode) {
+                    // Mouse Mode -> Scroll Mode
+                    Toast.makeText(mService, "Scroll Mode", Toast.LENGTH_SHORT).show();
+                    isInScrollMode = true;
+                } else if (!isEnabled) {
+                    // Dpad mode -> Mouse mode
+                    setMouseModeEnabled(true);
+                    isInScrollMode = false;
+                }
+            }
+            // bossKey is enabled. Handle this here itself and don't let it reach system
+            return true;
+        }
+        else if (keyEvent.getKeyCode() == bossKey && isBossKeyDisabled) {
             // bossKey is set to disabled, let system do it's thing
             return false;
         }

@@ -3,12 +3,11 @@ package io.github.virresh.matvt.services;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import io.github.virresh.matvt.BuildConfig;
 import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
 import io.github.virresh.matvt.engine.impl.PointerControl;
 import io.github.virresh.matvt.helper.Helper;
@@ -20,6 +19,7 @@ import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpe
 public class MouseEventService extends AccessibilityService {
 
     private MouseEmulationEngine mEngine;
+    private static String TAG_NAME = "MATVT_SERVICE";
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {}
@@ -27,7 +27,7 @@ public class MouseEventService extends AccessibilityService {
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
         super.onKeyEvent(event);
-        Logger.getLogger("WTFLOGGER").log(Level.INFO, "Key ===>>>>>>>>>> " + event.getKeyCode());
+        Log.i(TAG_NAME, "MATVT Received Key => " + event.getKeyCode() + ", Action => " + event.getAction() + ", Repetition value => " + event.getRepeatCount() + ", Scan code => " + event.getScanCode());
         if (Helper.isAnotherServiceInstalled(this) &&
                 event.getKeyCode() == KeyEvent.KEYCODE_HOME) return true;
         if (Helper.isOverlayDisabled(this)) return false;
@@ -40,10 +40,12 @@ public class MouseEventService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        Log.i(TAG_NAME, "Starting service initialization sequence. App version " + BuildConfig.VERSION_NAME);
         bossKey = KeyEvent.KEYCODE_VOLUME_MUTE;
         PointerControl.isBordered = Helper.getMouseBordered(this);
         scrollSpeed = Helper.getScrollSpeed(this);
         MouseEmulationEngine.isBossKeyDisabled = Helper.isBossKeyDisabled(this);
+        MouseEmulationEngine.isBossKeySetToToggle = Helper.isBossKeySetToToggle(this);
         if (Helper.isOverriding(this)) bossKey = Helper.getOverrideValue(this);
         if (Settings.canDrawOverlays(this)) init();
     }
@@ -55,6 +57,12 @@ public class MouseEventService extends AccessibilityService {
             asi.flags |= AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;
             this.setServiceInfo(asi);
         }
+        Log.i(TAG_NAME, "Configuration -- Scroll Speed " + scrollSpeed);
+        Log.i(TAG_NAME, "Configuration -- Boss Key Disabled " + MouseEmulationEngine.isBossKeyDisabled);
+        Log.i(TAG_NAME, "Configuration -- Boss Key Toggleable " + MouseEmulationEngine.isBossKeySetToToggle);
+        Log.i(TAG_NAME, "Configuration -- Is Bordered " + PointerControl.isBordered);
+        Log.i(TAG_NAME, "Configuration -- Boss Key value " + bossKey);
+
         mEngine = new MouseEmulationEngine(this, mOverlayView);
         mEngine.init(this);
     }

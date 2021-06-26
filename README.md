@@ -3,11 +3,11 @@
 
 #### Please read the After Install instructions carefully otherwise you might end up soft-bricking yourself (it's possible to recover, but why do you want to risk it, eh?)
 
-# MATVT: Mouse for Android TV Toggle
+# MATVT: Mouse for Android TV Toggle (Now for flipphones as well)
 
-Hard to reach portions of some legacy app that you're running on your Android TV?
-Feeling the need to have a touch input in your Android TV?
-Or just looking for an alternative to the famous Mouse Toggle App for your TV?
+Hard to reach portions of some legacy app that you're running on your Android TV (/flipphone)?
+Feeling the need to have a touch input in your Android TV (/flipphone)?
+Or just looking for an alternative to the famous Mouse Toggle App for your TV (/flipphone)?
 
 MATVT solves all the above. Unfortunately, it's not on the playstore, and there are no plans to
 launch it there either. If you'd like to see it on playstore, please let me know in the issues
@@ -17,37 +17,36 @@ Official Releases (and pre-releases) can be seen at https://github.com/virresh/m
 The latest stable release fit for usage on TV can be downloaded at https://github.com/virresh/matvt/releases/latest.  
 
 ## So what does this app do?
-MATVT is intended for users running Android TV (Android version 9+) and have a big remote with
+MATVT is intended for users running Android TV / Flipphone (Android version 7+, limited functionality on Android 6 flipphone) and have a big remote with
 atleast the following:
 - DPAD (for up, down, left, right and center buttons)
-- Color buttons (Red, Green, Yellow, Blue)
-- Info button
+- A spare key to toggle mouse mode (we call it the BossKey)
+- <Optional> Color buttons (Red, Green, Yellow, Blue)
+- <Optional> Info button
 
-After installing this app, you'll get a (*BIG*) mouse cursor that can move around, perform clicks and
+After installing this app, you'll get a mouse cursor that can move around, perform clicks and
 left / right / up / down swipes from your remote itself without any extra hardware (no need to pair
 with an android phone / laptop etc)
-
-### UPDATE: Thanks to community contributions, now the app can be run on Android Boxes with small sized remotes as well. Checkout the how to use section for more information
 
 ## How to install?
 Download the APK from the releases section and side-load it on your TV.
 The source-code is open and available should you wish to inspect it / build it yourself / don't
 trust the release apk ;)
 
+Remember there are two apks, one for Android TVs, one for Android FlipPhones. The one's without a `-phone` suffix are for flipphones, the others are for TVs.
+
 ## How to use?
-- DPAD is for movement and single clicks (I think I added long click support too, but isn't very reliable)
+- DPAD is for movement and single clicks (has long click support too, but isn't very reliable)
 - The color buttons are for swiping. RED and GREEN for up/down swipe, YELLOW and BLUE for left/right swipe
 - Info button will instantly toggle mouse visibility (so you can switch between mouse and no mouse instantly)
 - ~~Pressing back button for more than 3 seconds will disable the accessibility service completely~~ This is now removed.
 - The mouse will auto-disappear after a short while and re-appear when you press another relevant button.
-- Toggling mouse visibility via the Info button resets cursor position
+- Toggling mouse modes resets cursor position
 - The mouse warps around your TV sides, so you can roll over from the top of your TV to the bottom instantly
-- Mouse movement is momentum based, so keeping key pressed for longer will increase the movement / send multiple swipes
+- Mouse movement is momentum based, so keeping key pressed for longer will increase the movement / send multiple swipes in scroll mode
 - For remotes who don't have the above buttons, a `Boss Key` is available which can be used to toggle between mouse mode / scroll mode / dpad mode. By default this is the mute key, but can be overridden in the configuration settings. See the Youtube video linked below by TechDoctorUK for a demo of how that works.
-- You can change the cursor icon used from the companion GUI app. It also supports changing mouse size / scroll speed.
+- You can change the cursor icon used from the companion GUI app. It also supports several useful mouse configurations, detailed in a separate section below
 
-
-Shoutout to @sweenwolf for enhancing the app to work on tv boxes with less remote buttons.  
 See a demo of a modified version in action by TechDoctorUK at:
 [https://youtu.be/UC7bPw2tG4c](https://youtu.be/UC7bPw2tG4c)
 
@@ -56,8 +55,20 @@ See a demo of a modified version in action by TechDoctorUK at:
 other system apps. If you don't do this step and enable the accessibility service beforehand, the app won't have
 necessary permissions to do anything and it'll keep consuming your input, so your remote will no longer work.
 If you have gotten yourself in this situation, see FAQ.
-- *AFTER* doing the above, you can go to accesibility settings and enable MATVT service.
+- *AFTER* doing the above, you can go to accessibility settings and enable MATVT service.
 - Now you can press the info button and there you have your mouse
+
+# Configurations available in the APP:
+- Mouse Size
+- Mouse Scroll Speed `**`
+- Mouse Icon (two icons, light and transparent available)
+- Bordered Window (Enabling this will prevent the cursor from warping over the screen edges)
+- Disable Boss Key (If you have a full size remote, you don't need to keep a boss key. Info key and color buttons are sufficient, read how to use section for more info)
+- Will Boss Key Toggle (When remotes don't allow long pressing, this will allow people to cycle through various modes on key press in the order: Dpad -> Mouse -> Scroll -> Dpad) `*`
+- Override Activation Key (Select this to set a custom keyCode for bossKey)
+
+` *` Not available on FlipPhone version
+`**` Not available on FlipPhones with Android 6.
 
 # FAQs
 
@@ -92,13 +103,15 @@ If you have gotten yourself in this situation, see FAQ.
 # Redistributing and Creating MODs  
 
 I welcome everyone who'd like to hack on the application, but I request everyone to stick by the following
-- Please consider sending the enhancement to this project itself. I'm open to all enhancements and fixes. The whole point of making this app open source is so that folks have full access to the source code and don't have to pay anything for it.  
+- Please consider sending the enhancement to this project itself. I'm open to all enhancements and fixes. The whole point of making this app open source is so that folks have full access to the source code and don't have to pay anything for it.
 - Please considering pointing to the latest releases from this repository itself, unless you explicitly want folks to download an old version. This prevents more people from downloading old versions and reporting bugs that might have been fixed.
-- If you absolutely do not want to contribute back anything here, then please add a disclaimer to your distribution that it's bugs should not be reported here. 
+- If you absolutely do not want to contribute back anything here, then please add a disclaimer to your distribution that it's bugs should not be reported here.
+- By no means should you think that the source code being free means you can sell it. The source code is officially licensed under GPLv3, kindly abide by it's terms of use (it requires disclosing source code).
+- If you want to make commercial application out of the project and for some reason need another license / cannot abide by terms of GPL, please file an issue to discuss.
 
 **What would happen I don't do the above?**
 Nothing. Frankly, I don't really care how people use this code. But eventually without community support or corporate backing, open source projects like this die, and this one will die too. A time will come when no developer would want to open source their projects because it's a total loss of time and spend their time making stuff behind paywalls.
-
+Also keep in mind this project source has contributions from several people.
 
 # Reporting Bugs
 Please ensure to report bugs against an official release. It's hard for me to track down mods. Please try the latest official release before reporting a bug, just in case the latest version has fixed issues that you might be facing.  
@@ -110,7 +123,7 @@ All kinds of contributions are welcome. Two ways of contributing:
 
 # Credits
 Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse  
-Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent curson images   
+Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent cursor images
 Thanks to TechDoctorUK for making a demo video  
 
 # Disclaimer
