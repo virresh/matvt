@@ -99,7 +99,10 @@ If you have gotten yourself in this situation, see FAQ.
 - **How do you sustain the project?**
   It's currently on Ad-Hoc basis. I devote my free time amongst my open source projects and maintain them. This project is not funded by anyone. It totally relies on community support. There have been generous folks (like @sweenwolf) who've contributed to the code base without any kind of compensation.
 
-  
+- **Mouse doesn't toggle with certain keys on chromecast?**
+  Chromecast use infrared for some keys, which actually operates the TV, not the chromecast (like power, volume, mute buttons). There is a setting in chromecast to control chromecast audio instead of TV audio which should enable some of these keys, but in general the app cannot receive any IR key inputs unless your TV converts them to Android keycodes and sends it to the android operating system.  
+
+
 # Redistributing and Creating MODs  
 
 I welcome everyone who'd like to hack on the application, but I request everyone to stick by the following
