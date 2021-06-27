@@ -1,4 +1,4 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/virresh/matvt?style=for-the-badge) ![GitHub all releases](https://img.shields.io/github/downloads/virresh/matvt/total?style=for-the-badge)](https://github.com/virresh/matvt/releases/latest)    [![Gitter](https://img.shields.io/gitter/room/virresh/matvt?style=for-the-badge)](https://gitter.im/virresh/community)   <a href="https://www.buymeacoffee.com/support4all" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height=30 ></a> [![Website](https://img.shields.io/badge/Website-MATVT%20Website-blueviolet?style=for-the-badge)](https://virresh.github.io/projects/matvt)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/virresh/matvt?style=for-the-badge) ![GitHub all releases](https://img.shields.io/github/downloads/virresh/matvt/total?style=for-the-badge)](https://github.com/virresh/matvt/releases/latest)    [![Gitter](https://img.shields.io/gitter/room/virresh/matvt?style=for-the-badge)](https://gitter.im/virresh/community)  <a href='https://ko-fi.com/Z8Z74EEHQ' target='_blank'><img height='30' style='border:0px;height:30px;' src='https://cdn.ko-fi.com/cdn/kofi2.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a> [![Website](https://img.shields.io/badge/Website-MATVT%20Website-blueviolet?style=for-the-badge)](https://virresh.github.io/projects/matvt)
 
 
 #### Please read the After Install instructions carefully otherwise you might end up soft-bricking yourself (it's possible to recover, but why do you want to risk it, eh?)
@@ -122,7 +122,7 @@ Please ensure to report bugs against an official release. It's hard for me to tr
 # Contributing
 All kinds of contributions are welcome. Two ways of contributing:  
 - To contribute with your skills, please feel free to create a pull request in this repository. Bug reports can be done in the issues tab, and documentation happens similar to code contributions
-- To sponsor the project, you can buy me a coffee via https://bmc.xyz/support4all and mention the specific bug / issue you're interested in. You can also use the button above.
+- To sponsor the project, you can buy me a coffee via https://ko-fi.com/Z8Z74EEHQ and mention the specific bug / issue you're interested in. You can also use the button above.
 
 # Credits
 Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse  
