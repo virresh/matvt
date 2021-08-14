@@ -126,8 +126,9 @@ All kinds of contributions are welcome. Two ways of contributing:
 
 # Credits
 Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse  
-Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent cursor images
+Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent cursor images  
 Thanks to TechDoctorUK for making a demo video  
+Thanks to @hotcereal_twitter for providing more cursor images. [Link](https://gitter.im/virresh/community?at=6102e7b0d8381a2a839bbcfd).    
 
 # Disclaimer
 Please note that this project in no way, shape or form is sponsored by anybody. It's a fully independent project with generous folks contributing to it.

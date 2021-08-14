@@ -27,6 +27,9 @@ public class MouseCursorView extends View {
     private int pointerDrawableReference;
     private int pointerSizeReference;
 
+    private int pointerOffsetX;
+    private int pointerOffsetY;
+
     public MouseCursorView(Context context) {
         super(context);
         setWillNotDraw(false);
@@ -45,7 +48,10 @@ public class MouseCursorView extends View {
 
     public void updateFromPreferences() {
         Context ctx = getContext();
-        pointerDrawableReference = IconStyleSpinnerAdapter.textToResourceIdMap.getOrDefault(Helper.getMouseIconPref(ctx), R.drawable.pointer);
+        String iconStr = Helper.getMouseIconPref(ctx);
+        pointerDrawableReference = IconStyleSpinnerAdapter.textToResourceIdMap.getOrDefault(iconStr, R.drawable.pointer);
+        pointerOffsetX = IconStyleSpinnerAdapter.textToOffsetX.getOrDefault(iconStr, 0);
+        pointerOffsetY = IconStyleSpinnerAdapter.textToOffsetY.getOrDefault(iconStr, 0);
         pointerSizeReference = Helper.getMouseSizePref(ctx) + 1;
         setBitmap(getContext());
     }
@@ -54,7 +60,7 @@ public class MouseCursorView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         mPaintBox.setAlpha(DEFAULT_ALPHA);
-        canvas.drawBitmap(mPointerBitmap, mPointerLocation.x, mPointerLocation.y, mPaintBox);
+        canvas.drawBitmap(mPointerBitmap, mPointerLocation.x - 50 * pointerSizeReference * pointerOffsetX / 209, mPointerLocation.y - 50 * pointerSizeReference * pointerOffsetY / 209, mPaintBox);
     }
 
     public void updatePosition(PointF p) {

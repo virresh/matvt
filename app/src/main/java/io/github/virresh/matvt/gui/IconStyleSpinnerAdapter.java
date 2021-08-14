@@ -28,10 +28,33 @@ public class IconStyleSpinnerAdapter extends ArrayAdapter<String> {
     private final List<String> objects;
     private Context context;
     public static Map<String, Integer> textToResourceIdMap = new HashMap<String, Integer>();
+    public static Map<String, Integer> textToOffsetX = new HashMap<String, Integer>();
+    public static Map<String, Integer> textToOffsetY = new HashMap<String, Integer>();
 
     static {
         textToResourceIdMap.put("Default", R.drawable.pointer);
+        textToOffsetX.put("Default", 0);
+        textToOffsetY.put("Default", 0);
+
         textToResourceIdMap.put("Light", R.drawable.pointer_light);
+        textToOffsetX.put("Light", 0);
+        textToOffsetY.put("Light", 0);
+
+        textToResourceIdMap.put("Dark", R.drawable.pointer_mac);
+        textToOffsetX.put("Dark", 8);
+        textToOffsetY.put("Dark", 6);
+
+        textToResourceIdMap.put("Orb", R.drawable.light_orb);
+        textToOffsetX.put("Orb", 54);
+        textToOffsetY.put("Orb", 52);
+
+        textToResourceIdMap.put("Orb Dark", R.drawable.dark_orb);
+        textToOffsetX.put("Orb Dark", 54);
+        textToOffsetY.put("Orb Dark", 52);
+
+        textToResourceIdMap.put("Hand", R.drawable.finger_mac);
+        textToOffsetX.put("Hand", 56);
+        textToOffsetY.put("Hand", 10);
     }
 
     public IconStyleSpinnerAdapter(@NonNull Context context, int resource, int textViewId, @NonNull List<String> objects) {
