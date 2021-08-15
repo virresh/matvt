@@ -28,6 +28,17 @@ After installing this app, you'll get a mouse cursor that can move around, perfo
 left / right / up / down swipes from your remote itself without any extra hardware (no need to pair
 with an android phone / laptop etc)
 
+#### Basic Functionality
+<img src="meta/basic.gif" height="200"/>
+
+#### Mouse Warps over borders
+<img src="meta/border_warp.gif" height="200"/>
+
+#### Different Sizes and Skins
+<img src="meta/mouse_sizes.gif" height="200"/>
+
+And a lot more functionality. See the configurations section
+
 ## How to install?
 Download the APK from the releases section and side-load it on your TV.
 The source-code is open and available should you wish to inspect it / build it yourself / don't
