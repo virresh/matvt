@@ -1,14 +1,15 @@
 <resources>
     <string name="app_name">MATVT - Mouse for Android TV Toggle</string>
     <string name="accessibility_service_description">Control mouse cursor on your Android TV using your remote</string>
-    <string name="perm_acc_allowed">Accessibility Permissions : Granted</string>
-    <string name="perm_acc_denied">Accessibility Permissions : Not Granted</string>
-    <string name="perm_overlay_allowed">Overlay Permissions : Granted</string>
-    <string name="perm_overlay_denied">Overlay Permissions : Not Granted</string>
-    <string name="serv_acc_allowed">Accessibility Service : Running</string>
-    <string name="serv_acc_denied">Accessibility Service : Not Running</string>
-    <string name="serv_overlay_allowed">Overlay Service : Running</string>
-    <string name="serv_overlay_denied">Overlay Service : Not Running</string>
+    <string name="perm_acc_allowed">Accessibility Permissions : <font color='#FF00C853'>Granted</font></string>
+    <string name="perm_acc_denied">Accessibility Permissions : <font color='#FFD50000'>Not Granted</font></string>
+    <string name="perm_overlay_allowed">Overlay Permissions : <font color='#FF00C853'>Granted</font></string>
+    <string name="perm_overlay_denied">Overlay Permissions : <font color='#FFD50000'>Not Granted</font></string>
+    <string name="serv_acc_allowed">Accessibility Service : <font color='#FF00C853'>Running</font></string>
+    <string name="serv_acc_denied">Accessibility Service : <font color='#FFD50000'>Not Running</font></string>
+    <string name="serv_overlay_allowed">Overlay Service : <font color='#FF00C853'>Running</font></string>
+    <string name="serv_overlay_denied">Overlay Service : <font color='#FFD50000'>Not Running</font></string>
+    <string name="KeyDetection_Help_BossKey">Press and Hold a key for 3 seconds then release it to set as Boss Key\n\nBoss key allows you to Enable/Disable Mouse Service as well as Toggle b/w Scroll and D-Pad Mode.\nIf the popup does not appear then that key is incompatible.</string>
     <string-array name="mouse_style_arr">
         <item>Dark (default)</item>
         <item>Light</item>

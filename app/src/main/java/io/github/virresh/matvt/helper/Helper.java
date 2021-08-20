@@ -61,13 +61,13 @@ public class Helper {
         editor.commit();
     }
 
-    public static int getOverrideValue(Context ctx) {
+    public static int getBossKeyValue(Context ctx) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
         return sp.getInt(PREF_KEY_CB_OVERRIDE_VAL, 164);
     }
 
     @SuppressLint("ApplySharedPref")
-    public static void setOverrideValue(Context ctx, int val) {
+    public static void setBossKeyValue(Context ctx, int val) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt(PREF_KEY_CB_OVERRIDE_VAL, val);
@@ -102,7 +102,7 @@ public class Helper {
 
     public static int getScrollSpeed(Context ctx) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
-        return sp.getInt(PREF_KEY_SCROLL_SPEED, 4);
+        return sp.getInt(PREF_KEY_SCROLL_SPEED, 4);  //15 my sweet spot
     }
 
     @SuppressLint("ApplySharedPref")

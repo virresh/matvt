@@ -12,7 +12,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -26,18 +25,18 @@ import io.github.virresh.matvt.R;
 import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
 import io.github.virresh.matvt.engine.impl.PointerControl;
 import io.github.virresh.matvt.helper.Helper;
+import io.github.virresh.matvt.helper.KeyDetection;
 
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpeed;
 
 public class GuiActivity extends AppCompatActivity {
     CountDownTimer repopulate;
-    CheckBox cb_override, cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
+    CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
 
     EditText et_override;
-    Button bt_override;
-    LinearLayout boss_override;
+    Button bt_saveBossKeyValue;
 
     Spinner sp_mouse_icon;
     SeekBar dsbar_mouse_size;
@@ -49,17 +48,15 @@ public class GuiActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gui);
+        setContentView(R.layout.activity_main_gui);
         gui_acc_perm = findViewById(R.id.gui_acc_perm);
         gui_acc_serv = findViewById(R.id.gui_acc_serv);
         gui_overlay_perm = findViewById(R.id.gui_overlay_perm);
         gui_overlay_serv = findViewById(R.id.gui_overlay_serv);
         gui_about = findViewById(R.id.gui_about);
-        boss_override = findViewById(R.id.boss_override);
 
-        bt_override = findViewById(R.id.bt_override);
+        bt_saveBossKeyValue = findViewById(R.id.bt_saveBossKey);
         et_override = findViewById(R.id.et_override);
-        cb_override = findViewById(R.id.cb_override);
 
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
         cb_disable_bossKey = findViewById(R.id.cb_disable_bossKey);
@@ -78,21 +75,20 @@ public class GuiActivity extends AppCompatActivity {
         sp_mouse_icon.setAdapter(iconStyleSpinnerAdapter);
 
         checkValues(iconStyleSpinnerAdapter);
-        showBossLayout(cb_override.isChecked());
-        cb_override.setOnCheckedChangeListener((compoundButton, b) -> {
-            showBossLayout(b);
-        });
 
-        bt_override.setOnClickListener(view -> {
+        bt_saveBossKeyValue.setOnClickListener(view -> {
             String dat = et_override.getText().toString();
             dat = dat.replaceAll("[^0-9]", "");
             int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_VOLUME_MUTE;
             else keyValue = Integer.parseInt(dat);
-            Helper.setOverrideStatus(this, cb_override.isChecked());
-            Helper.setOverrideValue(this, keyValue);
+            isBossKeyChanged();
+            Helper.setOverrideStatus(this, isBossKeyChanged());
+            Helper.setBossKeyValue(this, keyValue);
             bossKey = keyValue;
-            Toast.makeText(this, "New key is : "+keyValue, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "New Boss key is : "+keyValue, Toast.LENGTH_SHORT).show();
         });
+
+
 
         sp_mouse_icon.setOnItemSelectedListener(new OnItemSelectedListener() {
             // the listener is set after setting initial value to avoid echo if any
@@ -164,13 +160,14 @@ public class GuiActivity extends AppCompatActivity {
         findViewById(R.id.gui_setup_perm).setOnClickListener(view -> askPermissions());
     }
 
+    private boolean isBossKeyChanged() {
+        return Helper.getBossKeyValue(this) != 164;
+    }
+
     private void checkValues(IconStyleSpinnerAdapter adapter) {
         Context ctx = getApplicationContext();
-        String val = String.valueOf(Helper.getOverrideValue(ctx));
-        if (Helper.isOverriding(ctx)) {
-            cb_override.setChecked(true);
-            et_override.setText(val);
-        }
+        String val = String.valueOf(Helper.getBossKeyValue(ctx));
+        et_override.setText(val);
         String iconStyle = Helper.getMouseIconPref(ctx);
         sp_mouse_icon.setSelection(adapter.getPosition(iconStyle));
 
@@ -190,11 +187,6 @@ public class GuiActivity extends AppCompatActivity {
         cb_behaviour_bossKey.setChecked(bossKeyBehaviour);
     }
 
-    private void showBossLayout(boolean status) {
-        if (status) boss_override.setVisibility(View.VISIBLE);
-        else boss_override.setVisibility(View.GONE);
-    }
-
     private void askPermissions() {
         if (Helper.isOverlayDisabled(this)) {
             try {
@@ -212,6 +204,7 @@ public class GuiActivity extends AppCompatActivity {
     private void checkAccPerms() {
         if (Helper.isAccessibilityDisabled(this))
             try {
+//                startActivity(new Intent(getPackageManager().getLeanbackLaunchIntentForPackage("com.wolf.apm").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))); HELPER APP
                 startActivityForResult(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS),
                         ACTION_ACCESSIBILITY_PERMISSION_REQUEST_CODE);
             } catch (Exception exception) {
@@ -265,6 +258,8 @@ public class GuiActivity extends AppCompatActivity {
         //Checking services status
         checkServiceStatus();
 
+        if (et_override != null)
+            et_override.setText(Helper.getBossKeyValue(this)+"");
     }
 
     private void checkServiceStatus() {
@@ -279,5 +274,9 @@ public class GuiActivity extends AppCompatActivity {
             }
         };
         repopulate.start();
+    }
+
+    public void callDetect(View view) {
+        startActivity(new Intent(this, KeyDetection.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

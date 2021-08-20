@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/drawable/bg_button.xml" value="0.2375" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/drawable/focus_selector.xml" value="0.2485342019543974" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/layout-land/activity_gui.xml" value="0.25" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/layout-land/activity_test.xml" value="0.1392235609103079" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/layout/activity_gui.xml" value="0.21" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/layout/activity_key_detection.xml" value="0.3315696649029982" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/layout/activity_main_gui.xml" value="0.3315696649029982" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/layout/activity_test.xml" value="0.25" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/layout/spinner_icon_text_gui.xml" value="0.3315696649029982" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2485342019543974" />
+        <entry key="..\:/Development/Projects/AndroidApps/Beta_Apps/matvt/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2485342019543974" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

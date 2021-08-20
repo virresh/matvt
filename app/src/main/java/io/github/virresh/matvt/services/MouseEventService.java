@@ -11,6 +11,7 @@ import io.github.virresh.matvt.BuildConfig;
 import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
 import io.github.virresh.matvt.engine.impl.PointerControl;
 import io.github.virresh.matvt.helper.Helper;
+import io.github.virresh.matvt.helper.KeyDetection;
 import io.github.virresh.matvt.view.OverlayView;
 
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
@@ -27,6 +28,7 @@ public class MouseEventService extends AccessibilityService {
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
         super.onKeyEvent(event);
+        new KeyDetection(event);
         Log.i(TAG_NAME, "MATVT Received Key => " + event.getKeyCode() + ", Action => " + event.getAction() + ", Repetition value => " + event.getRepeatCount() + ", Scan code => " + event.getScanCode());
         if (Helper.isAnotherServiceInstalled(this) &&
                 event.getKeyCode() == KeyEvent.KEYCODE_HOME) return true;
@@ -46,7 +48,7 @@ public class MouseEventService extends AccessibilityService {
         scrollSpeed = Helper.getScrollSpeed(this);
         MouseEmulationEngine.isBossKeyDisabled = Helper.isBossKeyDisabled(this);
         MouseEmulationEngine.isBossKeySetToToggle = Helper.isBossKeySetToToggle(this);
-        if (Helper.isOverriding(this)) bossKey = Helper.getOverrideValue(this);
+        if (Helper.isOverriding(this)) bossKey = Helper.getBossKeyValue(this);
         if (Settings.canDrawOverlays(this)) init();
     }
 
