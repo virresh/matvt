@@ -53,6 +53,7 @@ public class MouseEventService extends AccessibilityService {
     }
 
     private void init() {
+        if (Helper.helperContext != null) Helper.helperContext = this;
         OverlayView mOverlayView = new OverlayView(this);
         AccessibilityServiceInfo asi = this.getServiceInfo();
         if (asi != null) {

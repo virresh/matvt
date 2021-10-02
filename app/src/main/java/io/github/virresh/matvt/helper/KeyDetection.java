@@ -5,6 +5,7 @@ import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.WindowManager;
@@ -22,7 +23,6 @@ public class KeyDetection extends AppCompatActivity{
 
     @SuppressLint("StaticFieldLeak")
     private static Activity activity;
-    private static TextView textView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class KeyDetection extends AppCompatActivity{
         });
         builder.setNegativeButton("NO", (dialog, whichButton) -> dialog.dismiss());
         AlertDialog alert = builder.create();
-        alert.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) alert.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         alert.show();
     }
 
