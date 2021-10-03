@@ -12,6 +12,9 @@ import java.util.List;
 
 public class Helper {
 
+    @SuppressLint("StaticFieldLeak")
+    public static Context helperContext;
+
     static final String PREFS_ID = "MATVT";
     static final String PREF_KEY_CB_OVERRIDE_STAT = "CB_OVERRIDE_STAT";
     static final String PREF_KEY_CB_OVERRIDE_VAL = "CB_OVERRIDE_VAL";

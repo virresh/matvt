@@ -48,6 +48,7 @@ public class GuiActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Helper.helperContext = this;
         setContentView(R.layout.activity_main_gui);
         gui_acc_perm = findViewById(R.id.gui_acc_perm);
         gui_acc_serv = findViewById(R.id.gui_acc_serv);

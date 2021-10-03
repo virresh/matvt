@@ -1,5 +1,7 @@
 package io.github.virresh.matvt.engine.impl;
 
+import static io.github.virresh.matvt.helper.Helper.helperContext;
+
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
 import android.content.Context;
@@ -11,8 +13,10 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,11 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 
 public class MouseEmulationEngine {
 
+    private static boolean DPAD_SELECT_PRESSED = false;
     private static String LOG_TAG = "MOUSE_EMULATION";
 
     CountDownTimer waitToChange;
@@ -42,6 +48,8 @@ public class MouseEmulationEngine {
     private AccessibilityService mService;
 
     private final PointerControl mPointerControl;
+
+    public static int stuckAtSide = 0;
 
     private int momentumStack;
 
@@ -56,6 +64,8 @@ public class MouseEmulationEngine {
     public static boolean isBossKeySetToToggle;
 
     private Handler timerHandler;
+
+    private Point DPAD_Center_Init_Point = new Point();
 
     private Runnable previousRunnable;
 
@@ -164,6 +174,23 @@ public class MouseEmulationEngine {
         };
         timerHandler.postDelayed(previousRunnable, 0);
     }
+
+    private void createSwipeForSingle (final PointF originPoint, final int direction) {
+        if (previousRunnable != null) {
+            detachPreviousTimer();
+        }
+        previousRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mPointerControl.reappear();
+                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+                momentumStack += 1;
+                timerHandler.postDelayed(this, 30);
+            }
+        };
+        timerHandler.postDelayed(previousRunnable, 0);
+    }
+
 
     /**
      * Auto Disappear mouse after some duration and reset momentum
@@ -282,16 +309,18 @@ public class MouseEmulationEngine {
         boolean consumed = false;
         if (keyEvent.getAction() == KeyEvent.ACTION_DOWN){
             if (scrollCodeMap.containsKey(keyEvent.getKeyCode())) {
-                if (isInScrollMode || colorSet.contains(keyEvent.getKeyCode())) {
+                if (isInScrollMode || colorSet.contains(keyEvent.getKeyCode()))
                     attachGesture(mPointerControl.getPointerLocation(), scrollCodeMap.get(keyEvent.getKeyCode()));
-                }
-                else if (movementCodeMap.containsKey(keyEvent.getKeyCode())){
+                else if (!isInScrollMode && stuckAtSide != 0 && keyEvent.getKeyCode() == stuckAtSide)
+                    createSwipeForSingle(mPointerControl.getCenterPointOfView(), scrollCodeMap.get(keyEvent.getKeyCode()));
+                else if (movementCodeMap.containsKey(keyEvent.getKeyCode()))
                     attachTimer(movementCodeMap.get(keyEvent.getKeyCode()));
-                }
                 consumed = true;
             }
             else if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
                 // just consume this event to prevent propagation
+                DPAD_Center_Init_Point = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
+                DPAD_SELECT_PRESSED = true;
                 consumed = true;
             }
         }
@@ -304,50 +333,63 @@ public class MouseEmulationEngine {
                 consumed = true;
             }
             else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
+                DPAD_SELECT_PRESSED = false;
                 detachPreviousTimer();
 //                if (keyEvent.getEventTime() - keyEvent.getDownTime() > 500) {
                     // unreliable long click event if button was pressed for more than 500 ms
                 int action = AccessibilityNodeInfo.ACTION_CLICK;
                 Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
-                List<AccessibilityWindowInfo> windowList= mService.getWindows();
-                boolean wasIME = false, focused = false;
-                for (AccessibilityWindowInfo window : windowList) {
-                    if (consumed || wasIME) {
-                        break;
-                    }
-                    List<AccessibilityNodeInfo> nodeHierarchy = findNode(window.getRoot(), action, pInt);
-                    for (int i=nodeHierarchy.size()-1; i>=0; i--){
-                        if (consumed || focused) {
-                            break;
-                        };
-                        AccessibilityNodeInfo hitNode = nodeHierarchy.get(i);
-                        List<AccessibilityNodeInfo.AccessibilityAction> availableActions = hitNode.getActionList();
-                        if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_ACCESSIBILITY_FOCUS)){
-                            focused = hitNode.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
-                        }
-//                        if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SELECT)){
-//                            hitNode.performAction(AccessibilityNodeInfo.ACTION_SELECT);
-//                        }
-//                        if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)){
-//                            consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//                        }
-                        if (window.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
-                            wasIME = true;
-                            consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                if (DPAD_Center_Init_Point.equals(pInt)) {
+                    List<AccessibilityWindowInfo> windowList = mService.getWindows();
+                    boolean wasIME = false, focused = false;
+                    for (AccessibilityWindowInfo window : windowList) {
+                        if (consumed || wasIME) {
                             break;
                         }
-
-                        if ((hitNode.getPackageName().equals("com.google.android.tvlauncher")
-                                && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK))) {
-                            if (hitNode.isFocusable()) {
-                                focused = hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
+                        List<AccessibilityNodeInfo> nodeHierarchy = findNode(window.getRoot(), action, pInt);
+                        for (int i = nodeHierarchy.size() - 1; i >= 0; i--) {
+                            if (consumed || focused) {
+                                break;
                             }
-                            consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                            ;
+                            AccessibilityNodeInfo hitNode = nodeHierarchy.get(i);
+                            List<AccessibilityNodeInfo.AccessibilityAction> availableActions = hitNode.getActionList();
+                            if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_ACCESSIBILITY_FOCUS)) {
+                                focused = hitNode.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
+                            }
+                            if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SELECT)) {
+                                hitNode.performAction(AccessibilityNodeInfo.ACTION_SELECT);
+                            }
+                            if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)) {
+                                consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                            }
+                            if (window.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD && !(hitNode.getPackageName()).toString().contains("leankeyboard")) {
+                                if (hitNode.getPackageName().equals("com.amazon.tv.ime") && keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && helperContext != null) {
+                                    InputMethodManager imm = (InputMethodManager) helperContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                    consumed = wasIME = true;
+                                } else {
+                                    wasIME = true;
+                                    consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                }
+                                break;
+                            }
+
+                            if ((hitNode.getPackageName().equals("com.google.android.tvlauncher")
+                                    && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK))) {
+                                if (hitNode.isFocusable()) {
+                                    focused = hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
+                                }
+                                consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                            }
                         }
+                    }
+                    if (!consumed && !wasIME) {
+                        mService.dispatchGesture(createClick(mPointerControl.getPointerLocation(), keyEvent.getEventTime() - keyEvent.getDownTime()), null, null);
                     }
                 }
-                if (!consumed && !wasIME) {
-                    mService.dispatchGesture(createClick(mPointerControl.getPointerLocation(), keyEvent.getEventTime() - keyEvent.getDownTime()), null, null);
+                else{
+                    //Implement Drag Function here
                 }
             }
         }

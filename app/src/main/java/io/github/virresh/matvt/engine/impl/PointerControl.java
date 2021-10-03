@@ -2,11 +2,11 @@ package io.github.virresh.matvt.engine.impl;
 
 import android.graphics.PointF;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 
@@ -66,6 +66,7 @@ public class PointerControl {
     public static boolean isBordered = false;
 
     public void move (int direction, int momentum) {
+
         int movementX = (int) (dirX[direction] * ((momentum)));
         int movementY = (int) (dirY[direction] * ((momentum)));
 
@@ -87,21 +88,30 @@ public class PointerControl {
         }
 
         else {
+            MouseEmulationEngine.stuckAtSide = 0;
 
             if (mPointerLocation.x + movementX >= 0 && mPointerLocation.x + movementX <= mPointerLayerView.getWidth())
                 mPointerLocation.x += movementX;
             else {
-                if (mPointerLocation.x < (mPointerLayerView.getWidth() / 2f))
+                if (mPointerLocation.x < (mPointerLayerView.getWidth() / 2f)) {
+                    MouseEmulationEngine.stuckAtSide = KeyEvent.KEYCODE_DPAD_LEFT;
                     mPointerLocation.x = 0;
-                else mPointerLocation.x = mPointerLayerView.getWidth();
+                }
+                else {
+                    MouseEmulationEngine.stuckAtSide = KeyEvent.KEYCODE_DPAD_RIGHT;
+                    mPointerLocation.x = mPointerLayerView.getWidth();
+                }
             }
-
             if (mPointerLocation.y + movementY >= 0 && mPointerLocation.y + movementY <= mPointerLayerView.getHeight())
                 mPointerLocation.y += movementY;
             else {
                 if (mPointerLocation.y < (mPointerLayerView.getHeight() / 2f)) {
+                    MouseEmulationEngine.stuckAtSide = KeyEvent.KEYCODE_DPAD_UP;
                     mPointerLocation.y = 0;
-                } else mPointerLocation.y = mPointerLayerView.getHeight();
+                } else {
+                    MouseEmulationEngine.stuckAtSide = KeyEvent.KEYCODE_DPAD_DOWN;
+                    mPointerLocation.y = mPointerLayerView.getHeight();
+                }
             }
         }
 
@@ -111,5 +121,9 @@ public class PointerControl {
     @NonNull
     PointF getPointerLocation() {
         return mPointerLocation;
+    }
+
+    PointF getCenterPointOfView() {
+        return new PointF(mPointerLayerView.getWidth() / 2f,mPointerLayerView.getWidth() / 2f);
     }
 }
