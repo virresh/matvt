@@ -7,4 +7,11 @@
         <item name="colorControlActivated">@color/blue</item>
         <item name="colorControlHighlight">@color/colorAccent</item>
     </style>
+    <style name="Wolf_Alert_Disp" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:colorAccent">@color/white</item>
+        <item name="android:colorControlHighlight">@color/white</item>
+    </style>
 </resources>

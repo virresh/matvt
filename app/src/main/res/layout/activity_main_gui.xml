@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_width="match_parent"
+<ScrollView xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
     xmlns:android="http://schemas.android.com/apk/res/android" >
@@ -15,45 +16,63 @@
             android:layout_marginBottom="20.0dip"
             android:text="Service Status"
             android:textAlignment="center"
-            android:textColor="#CA0000"
+            android:textColor="@color/blue"
             android:textSize="20.0sp" />
 
-        <TextView
-            android:textColor="@color/white"
-            android:id="@+id/gui_acc_perm"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Accessibility Permission"
-            android:textAlignment="textStart"
-            android:textSize="20.0sp" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_weight="0.5"
+                android:textColor="@color/white"
+                android:id="@+id/gui_acc_perm"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Accessibility Permission"
+                android:textAlignment="textStart"
+                android:textSize="20.0sp" />
 
-        <TextView
-            android:textColor="@color/white"
-            android:id="@+id/gui_acc_serv"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Accessibility Service"
-            android:textAlignment="textStart"
-            android:textSize="20.0sp" />
+            <TextView
+                android:layout_weight="0.5"
+                android:textColor="@color/white"
+                android:id="@+id/gui_acc_serv"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Accessibility Service"
+                android:textAlignment="textStart"
+                android:textSize="20.0sp" />
+        </LinearLayout>
 
-        <TextView
-            android:textColor="@color/white"
-            android:id="@+id/gui_overlay_perm"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Overlay Permission"
-            android:textAlignment="textStart"
-            android:textSize="20.0sp" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:textColor="@color/white"
-            android:id="@+id/gui_overlay_serv"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Overlay Service"
-            android:textAlignment="textStart"
-            android:textSize="20.0sp" />
+            <TextView
+                android:layout_weight="0.50"
+                android:textColor="@color/white"
+                android:id="@+id/gui_overlay_perm"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Overlay Permission"
+                android:textAlignment="textStart"
+                android:textSize="20.0sp" />
 
+            <TextView
+                android:layout_weight="0.50"
+                android:textColor="@color/white"
+                android:id="@+id/gui_overlay_serv"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Overlay Service"
+                android:textAlignment="textStart"
+                android:textSize="20.0sp" />
+
+
+        </LinearLayout>
         <Button
             android:id="@+id/gui_setup_perm"
             android:layout_width="wrap_content"
@@ -68,12 +87,28 @@
             android:textColor="@color/white" />
 
         <TextView
+            android:layout_marginTop="20dp"
+            android:nextFocusUp="@id/gui_setup_perm"
+            android:nextFocusDown="@id/dsbar_mouse_size"
+            android:id="@+id/gui_about"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:autoLink="web"
+            android:fontFamily="monospace"
+            android:linksClickable="true"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="20.0sp" />
+
+
+        <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20.0dip"
             android:text="Other Settings"
             android:textAlignment="center"
-            android:textColor="#CA0000"
+            android:textColor="@color/blue"
             android:textSize="20.0sp" />
 
 
@@ -99,7 +134,7 @@
                 android:focusable="true"
                 android:foregroundTint="@color/white"
                 android:max="4"
-                android:nextFocusUp="@id/gui_setup_perm"
+                android:nextFocusUp="@id/gui_about"
                 android:nextFocusDown="@id/dsbar_mouse_scspeed"
                 android:progress="1"
                 android:progressBackgroundTint="@color/white_2"
@@ -151,7 +186,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.50"
+                android:layout_weight="0.20"
                 android:text="Mouse Icon"
                 android:textAlignment="textStart"
                 android:textColor="@color/white"
@@ -161,7 +196,7 @@
                 android:id="@+id/sp_mouse_icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.50"
+                android:layout_weight="0.80"
                 android:drawSelectorOnTop="true"
                 android:popupBackground="@drawable/focus_selector"
                 android:dropDownWidth="match_parent"
@@ -171,11 +206,11 @@
         </LinearLayout>
 
         <CheckBox
-            android:nextFocusUp="@id/sp_mouse_icon"
             android:id="@+id/cb_border_window"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:nextFocusUp="@id/sp_mouse_icon"
             android:buttonTint="@color/white"
             android:layoutDirection="rtl"
             android:text="Bordered Window"
@@ -195,44 +230,81 @@
             android:textSize="20sp" />
 
         <CheckBox
-            android:id="@+id/cb_override"
+            android:id="@+id/cb_behaviour_bossKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:buttonTint="@color/white"
             android:layoutDirection="rtl"
-            android:text="Override Activation Key"
+            android:nextFocusUp="@id/cb_disable_bossKey"
+            android:text="Will Boss Key Toggle? (default is long press)"
             android:textColor="@color/white"
             android:textSize="20sp" />
 
         <LinearLayout
             android:weightSum="1"
+            android:layout_gravity="center"
             android:orientation="horizontal"
-            android:id="@+id/boss_override"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <EditText
-                android:inputType="number"
-                android:hint="(Default: 164)"
-                android:id="@+id/et_override"
+            <TextView
+                android:textAlignment="center"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:textSize="20sp"
+                android:layout_weight="0.20"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white_2"
+                android:text="Boss Key"/>
+
+            <EditText
+                android:textAlignment="center"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:id="@+id/et_override"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.20"
-                android:textColorHint="@color/white_2"
                 android:buttonTint="@color/white"
+                android:hint="(Default: 164)"
+                android:inputType="number"
+                android:nextFocusRight="@id/bt_detect"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white_2"
+                android:textSize="20sp"
+                tools:ignore="RtlCompat" />
+
+            <Button
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:onClick="callDetect"
+                android:id="@+id/bt_detect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.30"
+                android:background="@drawable/bg_button"
+                android:buttonTint="@color/white"
+                android:nextFocusLeft="@id/et_override"
+                android:nextFocusRight="@id/bt_saveBossKey"
+                android:text="DETECT"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
 
+
             <Button
-                android:id="@+id/bt_override"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:id="@+id/bt_saveBossKey"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.80"
+                android:layout_weight="0.30"
                 android:background="@drawable/bg_button"
                 android:buttonTint="@color/white"
-                android:nextFocusUp="@id/cb_override"
+                android:nextFocusLeft="@id/bt_detect"
                 android:text="SAVE"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
