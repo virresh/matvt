@@ -77,6 +77,8 @@ If you have gotten yourself in this situation, see FAQ.
 - Disable Boss Key (If you have a full size remote, you don't need to keep a boss key. Info key and color buttons are sufficient, read how to use section for more info)
 - Will Boss Key Toggle (When remotes don't allow long pressing, this will allow people to cycle through various modes on key press in the order: Dpad -> Mouse -> Scroll -> Dpad) `*`
 - Override Activation Key (Select this to set a custom keyCode for bossKey)
+- Scrolls when mouse touches the edges (thanks to [@sweenwolf](https://github.com/sweenwolf))
+- Automatically detect boss key code (again thanks to [@sweenwolf](https://github.com/sweenwolf) !)
 
 ` *` Not available on FlipPhone version
 `**` Not available on FlipPhones with Android 6.
@@ -137,7 +139,7 @@ All kinds of contributions are welcome. Two ways of contributing:
 
 # Credits
 Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse  
-Thanks to @sweenwolf for making this app work on remotes with less buttons, and for the app icons and fully transparent cursor images  
+Thanks to [@sweenwolf](https://github.com/sweenwolf) for making this app work on remotes with less buttons, and for the app icons, fully transparent cursor images, boss key autodetect and autoscroll on borders!    
 Thanks to TechDoctorUK for making a demo video  
 Thanks to @hotcereal_twitter for providing more cursor images. [Link](https://gitter.im/virresh/community?at=6102e7b0d8381a2a839bbcfd).    
 
