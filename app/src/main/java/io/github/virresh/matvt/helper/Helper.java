@@ -4,10 +4,19 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.provider.Settings;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 
+import androidx.annotation.RequiresApi;
+
+import com.google.gson.Gson;
+import com.tananaev.adblib.AdbBase64;
+import com.tananaev.adblib.AdbCrypto;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 
 public class Helper {
@@ -24,6 +33,7 @@ public class Helper {
     static final String PREF_KEY_MOUSE_BORDERED = "MOUSE_BORDERED";
     static final String PREF_KEY_CB_DISABLE_BOSSKEY = "DISABLE_BOSSKEY";
     static final String PREF_KEY_CB_BEHAVIOUR_BOSSKEY = "CB_BEHAVIOUR_BOSSKEY";
+    static final String PREF_KEY_CRYPTO_ADB = "ADB_CRYPTO";
 
     public static boolean isAccessibilityDisabled(Context ctx) {
         return !isAccServiceInstalled(ctx.getPackageName() + "/.services.MouseEventService", ctx);
@@ -154,6 +164,28 @@ public class Helper {
     public static boolean isBossKeySetToToggle(Context ctx) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
         return sp.getBoolean(PREF_KEY_CB_BEHAVIOUR_BOSSKEY, false);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static AdbCrypto getAdbCryptoKey(Context ctx) throws NoSuchAlgorithmException {
+        AdbCrypto crypto = null;
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        if (sp.contains(PREF_KEY_CRYPTO_ADB)) {
+            Gson gson = new Gson();
+            crypto = gson.fromJson(sp.getString(PREF_KEY_CRYPTO_ADB, null), AdbCrypto.class);
+        }
+        else {
+            crypto = AdbCrypto.generateAdbKeyPair(new AdbBase64() {
+                @Override
+                public String encodeToString(byte[] data) {
+                    return Base64.getEncoder().encodeToString(data);
+                }
+            });
+            Gson gson = new Gson();
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(PREF_KEY_CRYPTO_ADB, gson.toJson(crypto));
+        }
+        return crypto;
     }
 
 }

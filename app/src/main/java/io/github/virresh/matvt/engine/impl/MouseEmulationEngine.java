@@ -9,10 +9,16 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.hardware.input.InputManager;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.InputDevice;
+import android.view.InputEvent;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
@@ -20,7 +26,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,8 +40,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import io.github.virresh.matvt.helper.Helper;
+import io.github.virresh.matvt.services.MouseEventService;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 
@@ -45,7 +59,7 @@ public class MouseEmulationEngine {
     private boolean isInScrollMode = false;
 
     // service which started this engine
-    private AccessibilityService mService;
+    private MouseEventService mService;
 
     private final PointerControl mPointerControl;
 
@@ -68,6 +82,8 @@ public class MouseEmulationEngine {
     private Point DPAD_Center_Init_Point = new Point();
 
     private Runnable previousRunnable;
+
+    private static ArrayBlockingQueue<PointF> pointsQ = new ArrayBlockingQueue<PointF>(5);
 
     // tells which keycodes correspond to which pointer movement in scroll and movement mode
     // scroll directions don't match keycode instruction because that's how swiping works
@@ -129,7 +145,7 @@ public class MouseEmulationEngine {
         Log.i(LOG_TAG, "X, Y: " + mPointerControl.getPointerLocation().x + ", " + mPointerControl.getPointerLocation().y);
     }
 
-    public void init(@NonNull AccessibilityService s) {
+    public void init(@NonNull MouseEventService s) {
         this.mService = s;
         mPointerControl.reset();
         timerHandler = new Handler();
@@ -167,7 +183,8 @@ public class MouseEmulationEngine {
             @Override
             public void run() {
                 mPointerControl.reappear();
-                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+//                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+                createSwipe(originPoint, direction, 20 + momentumStack);
                 momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
@@ -183,7 +200,8 @@ public class MouseEmulationEngine {
             @Override
             public void run() {
                 mPointerControl.reappear();
-                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+//                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+                createSwipe(originPoint, direction, 20 + momentumStack);
                 momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
@@ -215,10 +233,11 @@ public class MouseEmulationEngine {
         }
     }
 
-    private static GestureDescription createClick (PointF clickPoint, long duration) {
+    private static GestureDescription createClick (PointF clickPoint, long duration) throws InterruptedException {
         final int DURATION = 1 + (int) duration;
         Log.i(LOG_TAG, "Actual Duration used -- " + DURATION);
         Path clickPath = new Path();
+        pointsQ.put(clickPoint);
         clickPath.moveTo(clickPoint.x, clickPoint.y);
         GestureDescription.StrokeDescription clickStroke =
                 new GestureDescription.StrokeDescription(clickPath, 0, DURATION);
@@ -227,10 +246,13 @@ public class MouseEmulationEngine {
         return clickBuilder.build();
     }
 
-    private static GestureDescription createSwipe (PointF originPoint, int direction, int momentum) {
-        final int DURATION = scrollSpeed + 8;
+    private GestureDescription createSwipe (PointF originPoint, int direction, int momentum) {
+        final int DURATION = scrollSpeed + 20;
         Path clickPath = new Path();
-        PointF lineDirection = new PointF(originPoint.x + momentum * PointerControl.dirX[direction], originPoint.y + momentum * PointerControl.dirY[direction]);
+        PointF lineDirection = new PointF(originPoint.x + (momentum + 75) * PointerControl.dirX[direction], originPoint.y + (momentum + 75) * PointerControl.dirY[direction]);
+
+        mService.shellSwipe((int) originPoint.x, (int) originPoint.y, (int) lineDirection.x, (int) lineDirection.y, DURATION);
+
         clickPath.moveTo(originPoint.x, originPoint.y);
         clickPath.lineTo(lineDirection.x, lineDirection.y);
         GestureDescription.StrokeDescription clickStroke =
@@ -385,7 +407,19 @@ public class MouseEmulationEngine {
                         }
                     }
                     if (!consumed && !wasIME) {
-                        mService.dispatchGesture(createClick(mPointerControl.getPointerLocation(), keyEvent.getEventTime() - keyEvent.getDownTime()), null, null);
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//                                injectMotionEvent(InputDevice.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_DOWN, SystemClock.uptimeMillis(), mPointerControl.getPointerLocation().x, mPointerControl.getPointerLocation().y, 1.0f);
+//                                injectMotionEvent(InputDevice.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_UP, SystemClock.uptimeMillis(), mPointerControl.getPointerLocation().x, mPointerControl.getPointerLocation().y, 0.0f);
+                                mService.shellTap((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
+                            }
+                            else {
+                                mService.dispatchGesture(createClick(mPointerControl.getPointerLocation(), keyEvent.getEventTime() - keyEvent.getDownTime()), gestureResultCallback, null);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e(LOG_TAG, "Could not dispatch Gesture!");
+                        }
                     }
                 }
                 else{
@@ -394,6 +428,77 @@ public class MouseEmulationEngine {
             }
         }
         return consumed;
+    }
+
+    private AccessibilityService.GestureResultCallback gestureResultCallback = new AccessibilityService.GestureResultCallback() {
+        @Override
+        public void onCompleted(GestureDescription gestureDescription) {
+            super.onCompleted(gestureDescription);
+            Log.i(LOG_TAG, "Completed gesture " + gestureDescription.toString());
+            pointsQ.poll();
+        }
+
+        @Override
+        public void onCancelled(GestureDescription gestureDescription) {
+            super.onCancelled(gestureDescription);
+            Log.i(LOG_TAG, "Failed gesture " + gestureDescription.toString());
+//            ProcessBuilder processBuilder = new ProcessBuilder();
+//            processBuilder.command("input ")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                long now = SystemClock.uptimeMillis();
+                PointF p = pointsQ.peek();
+                injectMotionEvent(InputDevice.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_DOWN, now, p.x, p.y, 1.0f);
+                injectMotionEvent(InputDevice.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_UP, now, p.x, p.y, 0.0f);
+            }
+            else {
+                Log.i(LOG_TAG, "System doesn't support any alternative for sending gestures. Quitting!");
+            }
+            pointsQ.poll();
+//            InputManager.getInstance();
+        }
+    };
+
+    /**
+     * Please do not modify this function. It has been deliberately crafted this way for very specific reasons.
+     * Proceed only if you know what you're doing
+     *
+     * @param inputSource
+     * @param action
+     * @param when
+     * @param x
+     * @param y
+     * @param pressure
+     */
+    @RequiresApi(api = Build.VERSION_CODES.P)
+    private void injectMotionEvent(int inputSource, int action, long when, float x, float y, float pressure) {
+//        HiddenApiBypass.addHiddenApiExemptions("Landroid.hardware.input.InputManager");
+        try {
+            Method getIMInstance = InputManager.class.getMethod("getInstance");
+            InputManager manager = (InputManager) getIMInstance.invoke(null);
+
+            Class[] paramTypes = new Class[2];
+            paramTypes[0] = InputEvent.class;
+            paramTypes[1] = Integer.TYPE;
+
+            Method injectIMIE = manager.getClass().getMethod("injectInputEvent", paramTypes);
+            MotionEvent motionEvent = MotionEvent.obtain(when, when, action, x, y, pressure,
+                    1.0f, 0, 1.0f, 1.0f, 0, 0);
+            motionEvent.setSource(inputSource);
+            Log.i(LOG_TAG, "injection MotionEvent: " + motionEvent);
+
+            Object[] params = new Object[2];
+            params[0] = motionEvent;
+            params[1] = 2;
+
+            Boolean res = (Boolean) injectIMIE.invoke(manager, params);
+            Log.i(LOG_TAG, "Motion Event Dispatch Succeeded ? -- " + res);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setMouseModeEnabled(boolean enable) {
