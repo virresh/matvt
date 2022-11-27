@@ -25,7 +25,7 @@ public class OverlayView extends RelativeLayout {
             overlayParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-
+            overlayParams.alpha = (float) 0.8;
         } else {
             overlayParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
