@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.github.virresh.matvt.BuildConfig;
 import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
@@ -152,6 +153,20 @@ public class MouseEmulationEngine {
         timerHandler.postDelayed(previousRunnable, 0);
     }
 
+    private AccessibilityService.GestureResultCallback gestureResultCallback = new AccessibilityService.GestureResultCallback() {
+        @Override
+        public void onCompleted(GestureDescription gestureDescription) {
+            super.onCompleted(gestureDescription);
+            Log.i(LOG_TAG, "Dispatch Gesture Completed Succesfully! -- " + gestureDescription.getStrokeCount());
+        }
+
+        @Override
+        public void onCancelled(GestureDescription gestureDescription) {
+            super.onCancelled(gestureDescription);
+            Log.i(LOG_TAG, "Dispatch Gesture was cancelled! -- " + gestureDescription.getStrokeCount());
+        }
+    };
+
     /**
      * Send input via Android's gestureAPI
      * Only sends swipes
@@ -167,7 +182,7 @@ public class MouseEmulationEngine {
             @Override
             public void run() {
                 mPointerControl.reappear();
-                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), gestureResultCallback, null);
                 momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
@@ -183,7 +198,7 @@ public class MouseEmulationEngine {
             @Override
             public void run() {
                 mPointerControl.reappear();
-                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
+                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), gestureResultCallback, null);
                 momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
@@ -216,6 +231,7 @@ public class MouseEmulationEngine {
     }
 
     private static GestureDescription createClick (PointF clickPoint, long duration) {
+        Log.i(LOG_TAG, "Click Event on Version - " + BuildConfig.VERSION_NAME);
         final int DURATION = 1 + (int) duration;
         Log.i(LOG_TAG, "Actual Duration used -- " + DURATION);
         Path clickPath = new Path();
@@ -228,6 +244,7 @@ public class MouseEmulationEngine {
     }
 
     private static GestureDescription createSwipe (PointF originPoint, int direction, int momentum) {
+        Log.i(LOG_TAG, "Swipe Event on Version - " + BuildConfig.VERSION_NAME);
         final int DURATION = scrollSpeed + 8;
         Path clickPath = new Path();
         PointF lineDirection = new PointF(originPoint.x + momentum * PointerControl.dirX[direction], originPoint.y + momentum * PointerControl.dirY[direction]);
@@ -342,54 +359,56 @@ public class MouseEmulationEngine {
                 if (DPAD_Center_Init_Point.equals(pInt)) {
                     List<AccessibilityWindowInfo> windowList = mService.getWindows();
                     boolean wasIME = false, focused = false;
-                    for (AccessibilityWindowInfo window : windowList) {
-                        if (consumed || wasIME) {
-                            break;
-                        }
-                        List<AccessibilityNodeInfo> nodeHierarchy = findNode(window.getRoot(), action, pInt);
-                        for (int i = nodeHierarchy.size() - 1; i >= 0; i--) {
-                            if (consumed || focused) {
-                                break;
-                            }
-                            ;
-                            AccessibilityNodeInfo hitNode = nodeHierarchy.get(i);
-                            List<AccessibilityNodeInfo.AccessibilityAction> availableActions = hitNode.getActionList();
-                            if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_ACCESSIBILITY_FOCUS)) {
-                                focused = hitNode.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
-                            }
-                            if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SELECT)) {
-                                hitNode.performAction(AccessibilityNodeInfo.ACTION_SELECT);
-                            }
-                            if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)) {
-                                consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                            }
-                            if (window.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD && !(hitNode.getPackageName()).toString().contains("leankeyboard")) {
-                                if (hitNode.getPackageName().equals("com.amazon.tv.ime") && keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && helperContext != null) {
-                                    InputMethodManager imm = (InputMethodManager) helperContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                    consumed = wasIME = true;
-                                } else {
-                                    wasIME = true;
-                                    consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                }
-                                break;
-                            }
-
-                            if ((hitNode.getPackageName().equals("com.google.android.tvlauncher")
-                                    && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK))) {
-                                if (hitNode.isFocusable()) {
-                                    focused = hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
-                                }
-                                consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                            }
-                        }
-                    }
+//                    for (AccessibilityWindowInfo window : windowList) {
+//                        if (consumed || wasIME) {
+//                            break;
+//                        }
+//                        List<AccessibilityNodeInfo> nodeHierarchy = findNode(window.getRoot(), action, pInt);
+//                        for (int i = nodeHierarchy.size() - 1; i >= 0; i--) {
+//                            if (consumed || focused) {
+//                                break;
+//                            }
+//                            ;
+//                            AccessibilityNodeInfo hitNode = nodeHierarchy.get(i);
+//                            List<AccessibilityNodeInfo.AccessibilityAction> availableActions = hitNode.getActionList();
+//                            if (availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_ACCESSIBILITY_FOCUS)) {
+//                                focused = hitNode.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
+//                            }
+//                            if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SELECT)) {
+//                                hitNode.performAction(AccessibilityNodeInfo.ACTION_SELECT);
+//                            }
+//                            if (hitNode.isFocused() && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)) {
+//                                consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+//                            }
+//                            if (window.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD && !(hitNode.getPackageName()).toString().contains("leankeyboard")) {
+//                                if (hitNode.getPackageName().equals("com.amazon.tv.ime") && keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && helperContext != null) {
+//                                    InputMethodManager imm = (InputMethodManager) helperContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+//                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//                                    consumed = wasIME = true;
+//                                } else {
+//                                    wasIME = true;
+//                                    consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+//                                }
+//                                break;
+//                            }
+//
+//                            if ((hitNode.getPackageName().equals("com.google.android.tvlauncher")
+//                                    && availableActions.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK))) {
+//                                if (hitNode.isFocusable()) {
+//                                    focused = hitNode.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
+//                                }
+//                                consumed = hitNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+//                            }
+//                        }
+//                    }
                     if (!consumed && !wasIME) {
-                        mService.dispatchGesture(createClick(mPointerControl.getPointerLocation(), keyEvent.getEventTime() - keyEvent.getDownTime()), null, null);
+                        Log.i(LOG_TAG, "Dispatching Event through Gesture API. Accessibility node click failed.");
+                        mService.dispatchGesture(createClick(mPointerControl.getPointerLocation(), keyEvent.getEventTime() - keyEvent.getDownTime()), gestureResultCallback, null);
                     }
                 }
                 else{
                     //Implement Drag Function here
+                    Log.i(LOG_TAG, "Trying to drag. This is not available.");
                 }
             }
         }
