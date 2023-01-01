@@ -7,21 +7,28 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 
 public class PointerControl {
-    private static String LOG_TAG = "POINTER_CONTROL";
+    private static final String LOG_TAG = "POINTER_CONTROL";
 
     // constants
-    public static int LEFT = 0;
-    public static int UP = 1;
-    public static int RIGHT = 2;
-    public static int DOWN = 3;
+    public static final int LEFT = 0;
+    public static final int UP = 1;
+    public static final int RIGHT = 2;
+    public static final int DOWN = 3;
 
     // Left, Up, Right, Down
-    public static int[] dirX = {-1, 0, 1,  0};
-    public static int[] dirY = { 0, -1, 0, 1};
+    public static final int[] dirX = {-1, 0, 1,  0};
+    public static final int[] dirY = { 0, -1, 0, 1};
+
+    // Indicates if we're running in bordered mode
+    private boolean isBordered = false;
+
+    // Indicates if the pointer is currently stuck at side
+    private int stuckAtSide = 0;
 
     // pointer location in screen coordinates
     private final PointF mPointerLocation = new PointF();
@@ -63,7 +70,9 @@ public class PointerControl {
         }
     }
 
-    public static boolean isBordered = false;
+    public int isStuckAtSide() {
+        return stuckAtSide;
+    }
 
     public void move (int direction, int momentum) {
 
@@ -86,19 +95,18 @@ public class PointerControl {
                 mPointerLocation.y += mPointerLayerView.getHeight();
             }
         }
-
         else {
-            MouseEmulationEngine.stuckAtSide = 0;
+            stuckAtSide = 0;
 
             if (mPointerLocation.x + movementX >= 0 && mPointerLocation.x + movementX <= mPointerLayerView.getWidth())
                 mPointerLocation.x += movementX;
             else {
                 if (mPointerLocation.x < (mPointerLayerView.getWidth() / 2f)) {
-                    MouseEmulationEngine.stuckAtSide = KeyEvent.KEYCODE_DPAD_LEFT;
+                    stuckAtSide = KeyEvent.KEYCODE_DPAD_LEFT;
                     mPointerLocation.x = 0;
                 }
                 else {
-                    MouseEmulationEngine.stuckAtSide = KeyEvent.KEYCODE_DPAD_RIGHT;
+                    stuckAtSide = KeyEvent.KEYCODE_DPAD_RIGHT;
                     mPointerLocation.x = mPointerLayerView.getWidth();
                 }
             }
@@ -106,10 +114,10 @@ public class PointerControl {
                 mPointerLocation.y += movementY;
             else {
                 if (mPointerLocation.y < (mPointerLayerView.getHeight() / 2f)) {
-                    MouseEmulationEngine.stuckAtSide = KeyEvent.KEYCODE_DPAD_UP;
+                    stuckAtSide = KeyEvent.KEYCODE_DPAD_UP;
                     mPointerLocation.y = 0;
                 } else {
-                    MouseEmulationEngine.stuckAtSide = KeyEvent.KEYCODE_DPAD_DOWN;
+                    stuckAtSide = KeyEvent.KEYCODE_DPAD_DOWN;
                     mPointerLocation.y = mPointerLayerView.getHeight();
                 }
             }
@@ -125,5 +133,13 @@ public class PointerControl {
 
     PointF getCenterPointOfView() {
         return new PointF(mPointerLayerView.getWidth() / 2f,mPointerLayerView.getWidth() / 2f);
+    }
+
+    public void setIsBordered(boolean isBordered) {
+        this.isBordered = isBordered;
+    }
+
+    public void updateCursorViewPreferences() {
+        mCursorView.updateFromPreferences();
     }
 }
