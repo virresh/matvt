@@ -6,16 +6,23 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
+
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
-import com.google.gson.Gson;
 import com.tananaev.adblib.AdbBase64;
 import com.tananaev.adblib.AdbCrypto;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.List;
 
@@ -33,7 +40,9 @@ public class Helper {
     static final String PREF_KEY_MOUSE_BORDERED = "MOUSE_BORDERED";
     static final String PREF_KEY_CB_DISABLE_BOSSKEY = "DISABLE_BOSSKEY";
     static final String PREF_KEY_CB_BEHAVIOUR_BOSSKEY = "CB_BEHAVIOUR_BOSSKEY";
-    static final String PREF_KEY_CRYPTO_ADB = "ADB_CRYPTO";
+    static final String IO_PUBLICKEY_FILENAME = "public_key.bin";
+    static final String IO_PRIVATEKEY_FILENAME = "private_key.bin";
+
 
     public static boolean isAccessibilityDisabled(Context ctx) {
         return !isAccServiceInstalled(ctx.getPackageName() + "/.services.MouseEventService", ctx);
@@ -168,23 +177,48 @@ public class Helper {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static AdbCrypto getAdbCryptoKey(Context ctx) throws NoSuchAlgorithmException {
+
         AdbCrypto crypto = null;
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
-        if (sp.contains(PREF_KEY_CRYPTO_ADB)) {
-            Gson gson = new Gson();
-            crypto = gson.fromJson(sp.getString(PREF_KEY_CRYPTO_ADB, null), AdbCrypto.class);
+        AdbBase64 adbBase64Encoder;
+        File packageFilesDir;
+        File publicKeyFile;
+        File privateKeyFile;
+
+        adbBase64Encoder = new AdbBase64() {
+            @Override
+            public String encodeToString(byte[] data) {
+                return Base64.getEncoder().encodeToString(data);
+            }
+        };
+
+        packageFilesDir = ctx.getFilesDir();
+        publicKeyFile = new File(packageFilesDir,IO_PUBLICKEY_FILENAME);
+        privateKeyFile = new File(packageFilesDir,IO_PRIVATEKEY_FILENAME);
+
+        try {
+
+            if (publicKeyFile.exists() && privateKeyFile.exists()) {
+
+                crypto = AdbCrypto.loadAdbKeyPair(adbBase64Encoder, privateKeyFile, publicKeyFile);
+
+            } else {
+
+                crypto = AdbCrypto.generateAdbKeyPair(adbBase64Encoder);
+                crypto.saveAdbKeyPair(privateKeyFile, publicKeyFile);
+
+            }
+
+        }catch (IOException Exception){
+
+            Log.e("HELPER", "Could not read/write key files");
+
+        }catch(InvalidKeySpecException Exception){
+
+            Log.e("HELPER","Could not load keys.");
+
         }
-        else {
-            crypto = AdbCrypto.generateAdbKeyPair(new AdbBase64() {
-                @Override
-                public String encodeToString(byte[] data) {
-                    return Base64.getEncoder().encodeToString(data);
-                }
-            });
-            Gson gson = new Gson();
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putString(PREF_KEY_CRYPTO_ADB, gson.toJson(crypto));
-        }
+
+
         return crypto;
     }
 
