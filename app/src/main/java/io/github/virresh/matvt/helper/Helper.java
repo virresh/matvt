@@ -10,7 +10,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -19,8 +18,6 @@ import com.tananaev.adblib.AdbCrypto;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
