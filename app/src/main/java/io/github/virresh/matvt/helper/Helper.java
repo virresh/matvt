@@ -29,6 +29,7 @@ public class Helper {
     public static Context helperContext;
 
     static final String PREFS_ID = "MATVT";
+    static final String PREF_ALERTS_HIDE_TOASTS = "HIDE_ALERTS";
     static final String PREF_KEY_CB_OVERRIDE_STAT = "CB_OVERRIDE_STAT";
     static final String PREF_KEY_CB_OVERRIDE_VAL = "CB_OVERRIDE_VAL";
     static final String PREF_KEY_MOUSE_ICON = "MOUSE_ICON";
@@ -144,6 +145,18 @@ public class Helper {
     public static boolean getMouseBordered(Context ctx) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
         return sp.getBoolean(PREF_KEY_MOUSE_BORDERED, false);
+    }
+    @SuppressLint("ApplySharedPref")
+    public static void setHideToastAlerts(Context ctx, Boolean val){
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(PREF_ALERTS_HIDE_TOASTS,val);
+        editor.commit();
+    }
+
+    public static boolean getHideToastAlerts(Context ctx){
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.getBoolean(PREF_ALERTS_HIDE_TOASTS, false);
     }
 
     @SuppressLint("ApplySharedPref")

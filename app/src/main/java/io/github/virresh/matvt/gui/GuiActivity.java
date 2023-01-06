@@ -32,7 +32,7 @@ import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpe
 
 public class GuiActivity extends AppCompatActivity {
     CountDownTimer repopulate;
-    CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
+    CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey, cb_hide_toasts;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
 
     EditText et_override;
@@ -60,6 +60,7 @@ public class GuiActivity extends AppCompatActivity {
         et_override = findViewById(R.id.et_override);
 
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
+        cb_hide_toasts = findViewById(R.id.cb_hide_toasts);
         cb_disable_bossKey = findViewById(R.id.cb_disable_bossKey);
         cb_behaviour_bossKey = findViewById(R.id.cb_behaviour_bossKey);
 
@@ -69,7 +70,7 @@ public class GuiActivity extends AppCompatActivity {
 
         // don't like to advertise in the product, but need to mention here
         // need to increase visibility of the open source version
-        gui_about.setText("MATVT v" + BuildConfig.VERSION_NAME + "\nThis is an open source project. It's available for free and will always be. If you find issues / would like to help in improving this project, please contribute at \nhttps://github.com/virresh/matvt");
+        gui_about.setText("MATVT v" + BuildConfig.VERSION_NAME + "\n\nThis is an open source project. It's available for free and will always be. If you find issues / would like to help in improving this project, please contribute at \nhttps://github.com/virresh/matvt");
 
         // render icon style dropdown
         IconStyleSpinnerAdapter iconStyleSpinnerAdapter = new IconStyleSpinnerAdapter(this, R.layout.spinner_icon_text_gui, R.id.textView, IconStyleSpinnerAdapter.getResourceList());
@@ -145,6 +146,11 @@ public class GuiActivity extends AppCompatActivity {
         cb_mouse_bordered.setOnCheckedChangeListener((compoundButton, b) -> {
             Helper.setMouseBordered(getApplicationContext(), b);
             PointerControl.isBordered = b;
+        });
+
+        cb_hide_toasts.setOnCheckedChangeListener((compoundButton, b) ->{
+            Helper.setHideToastAlerts(getApplicationContext(), b);
+            MouseEmulationEngine.areAlertsHidden = b;
         });
 
         cb_disable_bossKey.setOnCheckedChangeListener(((compoundButton, value) -> {
