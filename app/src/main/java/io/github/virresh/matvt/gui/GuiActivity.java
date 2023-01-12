@@ -187,6 +187,14 @@ public class GuiActivity extends AppCompatActivity {
         boolean bordered = Helper.getMouseBordered(ctx);
         cb_mouse_bordered.setChecked(bordered);
 
+        boolean toastVisibility;
+        if(!Helper.hasDeviceTypeBeenIdentified(ctx)){
+            toastVisibility = Helper.determineDeviceTypePolicy(ctx);
+        }else{
+            toastVisibility = Helper.getHideToastAlerts(ctx);
+        }
+        cb_hide_toasts.setChecked(toastVisibility);
+
         boolean bossKeyStatus = Helper.isBossKeyDisabled(ctx);
         cb_disable_bossKey.setChecked(bossKeyStatus);
 
