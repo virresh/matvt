@@ -11,7 +11,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 106
-        versionName '1.0.7-rs_adbserver_testbranch-tinydisplay_lab-test05'
+        versionName '1.0.7-rs_adbserver_testbranch-tinydisplay_lab-test08'
 
     }
 

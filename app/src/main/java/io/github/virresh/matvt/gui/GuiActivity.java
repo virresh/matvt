@@ -148,10 +148,10 @@ public class GuiActivity extends AppCompatActivity {
             PointerControl.isBordered = b;
         });
 
-        cb_hide_toasts.setOnCheckedChangeListener((compoundButton, b) ->{
-            Helper.setHideToastAlerts(getApplicationContext(), b);
-            MouseEmulationEngine.isHideToastsOptionEnabled = b;
-        });
+        cb_hide_toasts.setOnCheckedChangeListener(((compoundButton, value) -> {
+            Helper.setHideToastsOptionEnabled(getApplicationContext(), value);
+            MouseEmulationEngine.isHideToastsOptionEnabled = value;
+        }));
 
         cb_disable_bossKey.setOnCheckedChangeListener(((compoundButton, value) -> {
             Helper.setBossKeyDisabled(getApplicationContext(), value);
@@ -188,12 +188,16 @@ public class GuiActivity extends AppCompatActivity {
         cb_mouse_bordered.setChecked(bordered);
 
         boolean toastVisibility;
+
         if(!Helper.hasDeviceTypeBeenIdentified(ctx)){
             toastVisibility = Helper.determineDeviceTypePolicy(ctx);
+            Helper.setHideToastsOptionEnabled(ctx,toastVisibility);
         }else{
-            toastVisibility = Helper.getHideToastAlerts(ctx);
+            toastVisibility = Helper.isHideToastOptionEnabled(ctx);
         }
+
         cb_hide_toasts.setChecked(toastVisibility);
+
 
         boolean bossKeyStatus = Helper.isBossKeyDisabled(ctx);
         cb_disable_bossKey.setChecked(bossKeyStatus);
