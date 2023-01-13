@@ -73,7 +73,7 @@ public class MouseEmulationEngine {
 
     public static int scrollSpeed;
 
-    public static boolean areAlertsHidden;
+    public static boolean isHideToastsOptionEnabled;
 
     public static boolean isBossKeyDisabled;
 
@@ -521,7 +521,7 @@ public class MouseEmulationEngine {
 
     private void showToast(String message){
 
-        if(!areAlertsHidden){
+        if(!isHideToastsOptionEnabled){
             Toast.makeText(mService,message,Toast.LENGTH_SHORT).show();
         }else {
             Log.i(LOG_TAG,message);
