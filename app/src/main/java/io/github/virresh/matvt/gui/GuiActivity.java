@@ -150,7 +150,7 @@ public class GuiActivity extends AppCompatActivity {
 
         cb_hide_toasts.setOnCheckedChangeListener((compoundButton, b) ->{
             Helper.setHideToastAlerts(getApplicationContext(), b);
-            MouseEmulationEngine.areAlertsHidden = b;
+            MouseEmulationEngine.isHideToastsOptionEnabled = b;
         });
 
         cb_disable_bossKey.setOnCheckedChangeListener(((compoundButton, value) -> {
