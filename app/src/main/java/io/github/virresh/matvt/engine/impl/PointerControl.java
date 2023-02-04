@@ -7,7 +7,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 

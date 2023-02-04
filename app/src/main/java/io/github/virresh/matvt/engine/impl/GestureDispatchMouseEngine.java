@@ -509,25 +509,4 @@ public class GestureDispatchMouseEngine implements MouseEmulationEngine {
         }
         return result;
     }
-
-    /** Not used
-     * Letting this stay here just in case the code needs porting back to an obsolete version
-     * sometime in future
-     //    private void attachActionable (final int action, final AccessibilityNodeInfo node) {
-     //        if (previousRunnable != null) {
-     //            detachPreviousTimer();
-     //        }
-     //        previousRunnable = new Runnable() {
-     //            @Override
-     //            public void run() {
-     //                mPointerControl.reappear();
-     //                node.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
-     //                node.performAction(action);
-     //                node.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
-     //                timerHandler.postDelayed(this, 30);
-     //            }
-     //        };
-     //        timerHandler.postDelayed(previousRunnable, 0);
-     //    }
-     **/
 }
