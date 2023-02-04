@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,11 +27,11 @@ import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
 import io.github.virresh.matvt.engine.impl.PointerControl;
 import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.helper.KeyDetection;
-
-import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
-import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpeed;
+import io.github.virresh.matvt.services.MouseEventService;
 
 public class GuiActivity extends AppCompatActivity {
+    private static final String TAG_NAME = "MATVT_SERVICE";
+
     CountDownTimer repopulate;
     CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
@@ -42,13 +43,16 @@ public class GuiActivity extends AppCompatActivity {
     SeekBar dsbar_mouse_size;
     SeekBar dsbar_scroll_speed;
 
-    public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 701;
-    public static int ACTION_ACCESSIBILITY_PERMISSION_REQUEST_CODE = 702;
+    MouseEventService mService;
+
+    public static final int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 701;
+    public static final int ACTION_ACCESSIBILITY_PERMISSION_REQUEST_CODE = 702;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Helper.helperContext = this;
+        mService = MouseEventService.getInstance();
         setContentView(R.layout.activity_main_gui);
         gui_acc_perm = findViewById(R.id.gui_acc_perm);
         gui_acc_serv = findViewById(R.id.gui_acc_serv);
@@ -85,8 +89,8 @@ public class GuiActivity extends AppCompatActivity {
             isBossKeyChanged();
             Helper.setOverrideStatus(this, isBossKeyChanged());
             Helper.setBossKeyValue(this, keyValue);
-            bossKey = keyValue;
             Toast.makeText(this, "New Boss key is : "+keyValue, Toast.LENGTH_SHORT).show();
+            updateFromPreferences();
         });
 
 
@@ -98,7 +102,7 @@ public class GuiActivity extends AppCompatActivity {
                 Context ctx = getApplicationContext();
                 String style = iconStyleSpinnerAdapter.getItem(pos);
                 Helper.setMouseIconPref(ctx, iconStyleSpinnerAdapter.getItem(pos));
-//                Toast.makeText(ctx, "Icon style set to "+style+". Changes will take effect from next restart.", Toast.LENGTH_SHORT).show();
+                updateFromPreferences();
             }
 
             @Override
@@ -112,7 +116,7 @@ public class GuiActivity extends AppCompatActivity {
                     // do not do anything if the progress change was done programmatically
                     Context ctx = getApplicationContext();
                     Helper.setMouseSizePref(ctx, progress);
-//                    Toast.makeText(ctx, "Mouse size set. Changes will take effect from next restart.", Toast.LENGTH_SHORT).show();
+                    updateFromPreferences();
                 }
             }
 
@@ -130,8 +134,7 @@ public class GuiActivity extends AppCompatActivity {
                     // do not do anything if the progress change was done programmatically
                     Context ctx = getApplicationContext();
                     Helper.setScrollSpeed(ctx, progress);
-                    scrollSpeed = progress;
-//                    Toast.makeText(ctx, "Mouse size set. Changes will take effect from next restart.", Toast.LENGTH_SHORT).show();
+                    updateFromPreferences();
                 }
             }
 
@@ -144,17 +147,17 @@ public class GuiActivity extends AppCompatActivity {
 
         cb_mouse_bordered.setOnCheckedChangeListener((compoundButton, b) -> {
             Helper.setMouseBordered(getApplicationContext(), b);
-            PointerControl.isBordered = b;
+            updateFromPreferences();
         });
 
         cb_disable_bossKey.setOnCheckedChangeListener(((compoundButton, value) -> {
             Helper.setBossKeyDisabled(getApplicationContext(), value);
-            MouseEmulationEngine.isBossKeyDisabled = value;
+            updateFromPreferences();
         }));
 
         cb_behaviour_bossKey.setOnCheckedChangeListener((((compoundButton, value) -> {
             Helper.setBossKeyBehaviour(getApplicationContext(), value);
-            MouseEmulationEngine.isBossKeySetToToggle = value;
+            updateFromPreferences();
         })));
 
         populateText();
@@ -275,6 +278,19 @@ public class GuiActivity extends AppCompatActivity {
             }
         };
         repopulate.start();
+    }
+
+    private void updateFromPreferences() {
+        // Initiate update sequence if feasible.
+        if (mService == null) {
+            mService = MouseEventService.getInstance();
+        }
+        if (mService == null) {
+            Log.i(TAG_NAME, "Accessibility service is not connected. Changes will be applied next time it's started.");
+        }
+        else{
+            mService.updatePreferences();
+        }
     }
 
     public void callDetect(View view) {

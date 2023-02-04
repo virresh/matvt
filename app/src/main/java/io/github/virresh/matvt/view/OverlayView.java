@@ -41,6 +41,7 @@ public class OverlayView extends RelativeLayout {
         lp.height= RelativeLayout.LayoutParams.MATCH_PARENT;
 
         v.setLayoutParams(lp);
+        v.setVisibility(INVISIBLE);
         this.addView(v);
         Log.i("Overlay View", "W - H : " + this.getWidth() + " " + this.getHeight());
     }

@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
-
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 
@@ -24,6 +24,7 @@ import java.util.Base64;
 import java.util.List;
 
 public class Helper {
+    // TODO: Implement listener based sharedContext and replace instant commits with background commits.
 
     @SuppressLint("StaticFieldLeak")
     public static Context helperContext;
@@ -82,7 +83,12 @@ public class Helper {
 
     public static int getBossKeyValue(Context ctx) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
-        return sp.getInt(PREF_KEY_CB_OVERRIDE_VAL, 164);
+        return sp.getInt(PREF_KEY_CB_OVERRIDE_VAL, KeyEvent.KEYCODE_VOLUME_MUTE);
+    }
+
+    public static int getEffectiveBossKeyValue(Context ctx) {
+        if (isOverriding(ctx)) return getBossKeyValue(ctx);
+        return KeyEvent.KEYCODE_VOLUME_MUTE;
     }
 
     @SuppressLint("ApplySharedPref")
