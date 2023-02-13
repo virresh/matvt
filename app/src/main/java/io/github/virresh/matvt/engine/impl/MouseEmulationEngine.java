@@ -246,20 +246,19 @@ public class MouseEmulationEngine {
         return clickBuilder.build();
     }
 
-    private GestureDescription createSwipe (PointF originPoint, int direction, int momentum) {
-        final int DURATION = scrollSpeed + 20;
-        Path clickPath = new Path();
-        PointF lineDirection = new PointF(originPoint.x + (momentum + 75) * PointerControl.dirX[direction], originPoint.y + (momentum + 75) * PointerControl.dirY[direction]);
+    private void createSwipe (PointF originPoint, int direction, int momentum) {
 
+        final int DURATION = 300 - scrollSpeed*10;
+        Path clickPath = new Path();
+        PointF lineDirection = new PointF(originPoint.x + (75 + momentum) * PointerControl.dirX[direction], originPoint.y + (75+momentum) * PointerControl.dirY[direction]);
         mService.shellSwipe((int) originPoint.x, (int) originPoint.y, (int) lineDirection.x, (int) lineDirection.y, DURATION);
 
-        clickPath.moveTo(originPoint.x, originPoint.y);
-        clickPath.lineTo(lineDirection.x, lineDirection.y);
-        GestureDescription.StrokeDescription clickStroke =
-                new GestureDescription.StrokeDescription(clickPath, 0, DURATION);
-        GestureDescription.Builder clickBuilder = new GestureDescription.Builder();
-        clickBuilder.addStroke(clickStroke);
-        return clickBuilder.build();
+        try {
+            Thread.sleep(DURATION + 200);
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, "Thread interrupted: ",e);
+        }
+
     }
 
     public boolean perform (KeyEvent keyEvent) {
