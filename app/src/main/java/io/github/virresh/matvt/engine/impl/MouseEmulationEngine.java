@@ -73,6 +73,8 @@ public class MouseEmulationEngine {
 
     public static int scrollSpeed;
 
+    public static boolean isHideToastsOptionEnabled;
+
     public static boolean isBossKeyDisabled;
 
     public static boolean isBossKeySetToToggle;
@@ -276,8 +278,7 @@ public class MouseEmulationEngine {
                 waitToChange();
                 if (isEnabled){
                     isInScrollMode = !isInScrollMode;
-                    Toast.makeText(mService, isInScrollMode ? "Scroll Mode: Enabled" : "Scroll Mode: Disabled",
-                            Toast.LENGTH_SHORT).show();
+                    showToast(isInScrollMode ? "Scroll Mode: Enabled" : "Scroll Mode: Disabled");
                     return true;
                 }
             }
@@ -291,7 +292,7 @@ public class MouseEmulationEngine {
                     isInScrollMode = false;
                 } else if (isEnabled && !isInScrollMode) {
                     // Mouse Mode -> Scroll Mode
-                    Toast.makeText(mService, "Scroll Mode", Toast.LENGTH_SHORT).show();
+                    showToast("Scroll Mode");
                     isInScrollMode = true;
                 } else if (!isEnabled) {
                     // Dpad mode -> Mouse mode
@@ -312,14 +313,14 @@ public class MouseEmulationEngine {
                 // mouse already enabled, disable it and make it go away
                 this.isEnabled = false;
                 mPointerControl.disappear();
-                Toast.makeText(mService, "Dpad Mode", Toast.LENGTH_SHORT).show();
+                showToast("D-Pad Mode");
                 return true;
             } else {
                 // mouse is disabled, enable it, reset it and show it
                 this.isEnabled = true;
                 mPointerControl.reset();
                 mPointerControl.reappear();
-                Toast.makeText(mService, "Mouse/Scroll", Toast.LENGTH_SHORT).show();
+                showToast("Mouse/Scroll mode");
             }
         }
 
@@ -507,15 +508,27 @@ public class MouseEmulationEngine {
             isInScrollMode = false;
             mPointerControl.reset();
             mPointerControl.reappear();
-            Toast.makeText(mService, "Mouse Mode", Toast.LENGTH_SHORT).show();
+            showToast("Mouse Mode");
         }
         else {
             // Disable Mouse Mode
             this.isEnabled = false;
             mPointerControl.disappear();
-            Toast.makeText(mService, "D-Pad Mode", Toast.LENGTH_SHORT).show();
+            showToast("D-Pad Mode");
         }
     }
+
+    private void showToast(String message){
+
+        if(!isHideToastsOptionEnabled){
+            Toast.makeText(mService,message,Toast.LENGTH_SHORT).show();
+        }else {
+            Log.i(LOG_TAG,message);
+        }
+
+    }
+
+
 
     /**
      * Simple count down timer for checking keypress duration

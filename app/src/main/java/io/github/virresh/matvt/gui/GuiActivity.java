@@ -32,7 +32,7 @@ import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpe
 
 public class GuiActivity extends AppCompatActivity {
     CountDownTimer repopulate;
-    CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
+    CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey, cb_hide_toasts;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
 
     EditText et_override;
@@ -60,6 +60,7 @@ public class GuiActivity extends AppCompatActivity {
         et_override = findViewById(R.id.et_override);
 
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
+        cb_hide_toasts = findViewById(R.id.cb_hide_toasts);
         cb_disable_bossKey = findViewById(R.id.cb_disable_bossKey);
         cb_behaviour_bossKey = findViewById(R.id.cb_behaviour_bossKey);
 
@@ -147,6 +148,11 @@ public class GuiActivity extends AppCompatActivity {
             PointerControl.isBordered = b;
         });
 
+        cb_hide_toasts.setOnCheckedChangeListener(((compoundButton, value) -> {
+            Helper.setHideToastsOptionEnabled(getApplicationContext(), value);
+            MouseEmulationEngine.isHideToastsOptionEnabled = value;
+        }));
+
         cb_disable_bossKey.setOnCheckedChangeListener(((compoundButton, value) -> {
             Helper.setBossKeyDisabled(getApplicationContext(), value);
             MouseEmulationEngine.isBossKeyDisabled = value;
@@ -180,6 +186,18 @@ public class GuiActivity extends AppCompatActivity {
 
         boolean bordered = Helper.getMouseBordered(ctx);
         cb_mouse_bordered.setChecked(bordered);
+
+        boolean toastVisibility;
+
+        if(!Helper.hasDeviceTypeBeenIdentified(ctx)){
+            toastVisibility = Helper.determineDeviceTypePolicy(ctx);
+            Helper.setHideToastsOptionEnabled(ctx,toastVisibility);
+        }else{
+            toastVisibility = Helper.isHideToastOptionEnabled(ctx);
+        }
+
+        cb_hide_toasts.setChecked(toastVisibility);
+
 
         boolean bossKeyStatus = Helper.isBossKeyDisabled(ctx);
         cb_disable_bossKey.setChecked(bossKeyStatus);

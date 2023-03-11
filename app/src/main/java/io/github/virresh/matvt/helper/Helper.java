@@ -4,12 +4,15 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+
 
 import androidx.annotation.RequiresApi;
 
@@ -29,6 +32,7 @@ public class Helper {
     public static Context helperContext;
 
     static final String PREFS_ID = "MATVT";
+    static final String PREF_ALERTS_HIDE_TOASTS = "HIDE_ALERTS";
     static final String PREF_KEY_CB_OVERRIDE_STAT = "CB_OVERRIDE_STAT";
     static final String PREF_KEY_CB_OVERRIDE_VAL = "CB_OVERRIDE_VAL";
     static final String PREF_KEY_MOUSE_ICON = "MOUSE_ICON";
@@ -39,6 +43,7 @@ public class Helper {
     static final String PREF_KEY_CB_BEHAVIOUR_BOSSKEY = "CB_BEHAVIOUR_BOSSKEY";
     static final String IO_PUBLICKEY_FILENAME = "public_key.bin";
     static final String IO_PRIVATEKEY_FILENAME = "private_key.bin";
+    static final String PREF_HOST_DEVICETYPE = "DEVICE_TYPE";
 
 
     public static boolean isAccessibilityDisabled(Context ctx) {
@@ -145,6 +150,18 @@ public class Helper {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
         return sp.getBoolean(PREF_KEY_MOUSE_BORDERED, false);
     }
+    @SuppressLint("ApplySharedPref")
+    public static void setHideToastsOptionEnabled(Context ctx, Boolean val){
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(PREF_ALERTS_HIDE_TOASTS,val);
+        editor.commit();
+    }
+
+    public static boolean isHideToastOptionEnabled(Context ctx){
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.getBoolean(PREF_ALERTS_HIDE_TOASTS, false);
+    }
 
     @SuppressLint("ApplySharedPref")
     public static void setBossKeyDisabled(Context ctx, Boolean val) {
@@ -217,6 +234,33 @@ public class Helper {
 
 
         return crypto;
+    }
+
+    public static boolean hasDeviceTypeBeenIdentified(Context ctx){
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.contains(PREF_HOST_DEVICETYPE);
+    }
+
+    public static boolean determineDeviceTypePolicy(Context ctx){
+
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
+        Boolean deviceTypeRecommendedSettings;
+        double screenSize;
+
+        screenSize = Math.sqrt(Math.pow(metrics.widthPixels/metrics.xdpi,2) + Math.pow(metrics.heightPixels/metrics.ydpi,2));
+
+        if (screenSize < 4.5 || ctx.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)){
+            editor.putString(PREF_HOST_DEVICETYPE,"WEARABLE");
+            deviceTypeRecommendedSettings = true;
+        }else{
+            editor.putString(PREF_HOST_DEVICETYPE,"NOT_A_WEARABLE");
+            deviceTypeRecommendedSettings = false;
+        }
+
+        editor.commit();
+        return deviceTypeRecommendedSettings;
     }
 
 }
