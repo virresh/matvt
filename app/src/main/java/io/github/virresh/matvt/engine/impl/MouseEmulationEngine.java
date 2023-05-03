@@ -56,6 +56,10 @@ public class MouseEmulationEngine {
 
     CountDownTimer disappearTimer;
 
+    CountDownTimer swipeGestureCooldown;
+
+    private boolean isQueueEmpty = true;
+
     private boolean isInScrollMode = false;
 
     // service which started this engine
@@ -185,7 +189,7 @@ public class MouseEmulationEngine {
                 mPointerControl.reappear();
 //                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
                 createSwipe(originPoint, direction, 20 + momentumStack);
-                momentumStack += 1;
+                //momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
         };
@@ -202,7 +206,7 @@ public class MouseEmulationEngine {
                 mPointerControl.reappear();
 //                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
                 createSwipe(originPoint, direction, 20 + momentumStack);
-                momentumStack += 1;
+                //momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
         };
@@ -248,16 +252,35 @@ public class MouseEmulationEngine {
 
     private void createSwipe (PointF originPoint, int direction, int momentum) {
 
+        if(!isQueueEmpty) return;
+
+        isQueueEmpty = false;
+
         final int DURATION = 300 - scrollSpeed*10;
         Path clickPath = new Path();
         PointF lineDirection = new PointF(originPoint.x + (75 + momentum) * PointerControl.dirX[direction], originPoint.y + (75+momentum) * PointerControl.dirY[direction]);
         mService.shellSwipe((int) originPoint.x, (int) originPoint.y, (int) lineDirection.x, (int) lineDirection.y, DURATION);
 
+        swipeGestureCooldown =  new CountDownTimer(DURATION+200,100) {
+            @Override
+            public void onTick(long millisUntilFinished) {}
+            @Override
+            public void onFinish() {
+                isQueueEmpty = true;
+            }
+        };
+
+        swipeGestureCooldown.start();
+
+        momentumStack += 1;
+
+        /*
         try {
             Thread.sleep(DURATION + 200);
         } catch (InterruptedException e) {
             Log.e(LOG_TAG, "Thread interrupted: ",e);
         }
+         */
 
     }
 
