@@ -187,14 +187,7 @@ public class GuiActivity extends AppCompatActivity {
         boolean bordered = Helper.getMouseBordered(ctx);
         cb_mouse_bordered.setChecked(bordered);
 
-        boolean toastVisibility;
-
-        if(!Helper.hasDeviceTypeBeenIdentified(ctx)){
-            toastVisibility = Helper.determineDeviceTypePolicy(ctx);
-            Helper.setHideToastsOptionEnabled(ctx,toastVisibility);
-        }else{
-            toastVisibility = Helper.isHideToastOptionEnabled(ctx);
-        }
+        boolean toastVisibility = Helper.isHideToastOptionEnabled(ctx);
 
         cb_hide_toasts.setChecked(toastVisibility);
 
