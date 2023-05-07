@@ -71,6 +71,7 @@ public class MouseEventService extends AccessibilityService {
         bossKey = KeyEvent.KEYCODE_VOLUME_MUTE;
         PointerControl.isBordered = Helper.getMouseBordered(this);
         scrollSpeed = Helper.getScrollSpeed(this);
+        MouseEmulationEngine.isHideToastsOptionEnabled = Helper.isHideToastOptionEnabled(this);
         MouseEmulationEngine.isBossKeyDisabled = Helper.isBossKeyDisabled(this);
         MouseEmulationEngine.isBossKeySetToToggle = Helper.isBossKeySetToToggle(this);
         if (Helper.isOverriding(this)) bossKey = Helper.getBossKeyValue(this);
