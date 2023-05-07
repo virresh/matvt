@@ -19,7 +19,6 @@ import android.view.InputDevice;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -28,9 +27,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.services.MouseEventService;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
@@ -55,6 +50,10 @@ public class MouseEmulationEngine {
     CountDownTimer waitToChange;
 
     CountDownTimer disappearTimer;
+
+    CountDownTimer swipeGestureCoolDown;
+
+    private boolean isQueueEmpty = true;
 
     private boolean isInScrollMode = false;
 
@@ -185,7 +184,7 @@ public class MouseEmulationEngine {
                 mPointerControl.reappear();
 //                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
                 createSwipe(originPoint, direction, 20 + momentumStack);
-                momentumStack += 1;
+                //momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
         };
@@ -202,7 +201,7 @@ public class MouseEmulationEngine {
                 mPointerControl.reappear();
 //                mService.dispatchGesture(createSwipe(originPoint, direction, 20 + momentumStack), null, null);
                 createSwipe(originPoint, direction, 20 + momentumStack);
-                momentumStack += 1;
+                //momentumStack += 1;
                 timerHandler.postDelayed(this, 30);
             }
         };
@@ -246,20 +245,38 @@ public class MouseEmulationEngine {
         return clickBuilder.build();
     }
 
-    private GestureDescription createSwipe (PointF originPoint, int direction, int momentum) {
-        final int DURATION = scrollSpeed + 20;
-        Path clickPath = new Path();
-        PointF lineDirection = new PointF(originPoint.x + (momentum + 75) * PointerControl.dirX[direction], originPoint.y + (momentum + 75) * PointerControl.dirY[direction]);
+    private void createSwipe (PointF originPoint, int direction, int momentum) {
 
+        if(!isQueueEmpty) return;
+
+        isQueueEmpty = false;
+
+        final int DURATION = 300 - scrollSpeed*10;
+        Path clickPath = new Path();
+        PointF lineDirection = new PointF(originPoint.x + (75 + momentum) * PointerControl.dirX[direction], originPoint.y + (75+momentum) * PointerControl.dirY[direction]);
         mService.shellSwipe((int) originPoint.x, (int) originPoint.y, (int) lineDirection.x, (int) lineDirection.y, DURATION);
 
-        clickPath.moveTo(originPoint.x, originPoint.y);
-        clickPath.lineTo(lineDirection.x, lineDirection.y);
-        GestureDescription.StrokeDescription clickStroke =
-                new GestureDescription.StrokeDescription(clickPath, 0, DURATION);
-        GestureDescription.Builder clickBuilder = new GestureDescription.Builder();
-        clickBuilder.addStroke(clickStroke);
-        return clickBuilder.build();
+        swipeGestureCoolDown =  new CountDownTimer(DURATION+200,100) {
+            @Override
+            public void onTick(long millisUntilFinished) {}
+            @Override
+            public void onFinish() {
+                isQueueEmpty = true;
+            }
+        };
+
+        swipeGestureCoolDown.start();
+
+        momentumStack += 1;
+
+        /*
+        try {
+            Thread.sleep(DURATION + 200);
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, "Thread interrupted: ",e);
+        }
+         */
+
     }
 
     public boolean perform (KeyEvent keyEvent) {

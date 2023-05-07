@@ -189,7 +189,7 @@ public class MouseEventService extends AccessibilityService {
 //                Log.i(TAG_NAME, "Succeeded ? ===> " + response.isSuccessful());
 //            }
 //        });
-        sendShellInput("swipe " + x1.toString() + " " + y1.toString() + " " + x2.toString() + " " + y2.toString());
+        sendShellInput("swipe " + x1.toString() + " " + y1.toString() + " " + x2.toString() + " " + y2.toString() + " " + duration.toString());
     }
 
     public void shellTap(Integer x, Integer y) {

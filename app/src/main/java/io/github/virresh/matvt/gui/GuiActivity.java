@@ -69,7 +69,7 @@ public class GuiActivity extends AppCompatActivity {
 
         // don't like to advertise in the product, but need to mention here
         // need to increase visibility of the open source version
-        gui_about.setText("MATVT v" + BuildConfig.VERSION_NAME + "\nThis is an open source project. It's available for free and will always be. If you find issues / would like to help in improving this project, please contribute at \nhttps://github.com/virresh/matvt");
+        gui_about.setText("MATVT v" + BuildConfig.VERSION_NAME + "\n\nThis is an open source project. It's available for free and will always be. If you find issues / would like to help in improving this project, please contribute at \nhttps://github.com/virresh/matvt");
 
         // render icon style dropdown
         IconStyleSpinnerAdapter iconStyleSpinnerAdapter = new IconStyleSpinnerAdapter(this, R.layout.spinner_icon_text_gui, R.id.textView, IconStyleSpinnerAdapter.getResourceList());
