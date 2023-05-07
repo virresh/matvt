@@ -19,7 +19,6 @@ import android.view.InputDevice;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -28,9 +27,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.services.MouseEventService;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
@@ -56,7 +51,7 @@ public class MouseEmulationEngine {
 
     CountDownTimer disappearTimer;
 
-    CountDownTimer swipeGestureCooldown;
+    CountDownTimer swipeGestureCoolDown;
 
     private boolean isQueueEmpty = true;
 
@@ -261,7 +256,7 @@ public class MouseEmulationEngine {
         PointF lineDirection = new PointF(originPoint.x + (75 + momentum) * PointerControl.dirX[direction], originPoint.y + (75+momentum) * PointerControl.dirY[direction]);
         mService.shellSwipe((int) originPoint.x, (int) originPoint.y, (int) lineDirection.x, (int) lineDirection.y, DURATION);
 
-        swipeGestureCooldown =  new CountDownTimer(DURATION+200,100) {
+        swipeGestureCoolDown =  new CountDownTimer(DURATION+200,100) {
             @Override
             public void onTick(long millisUntilFinished) {}
             @Override
@@ -270,7 +265,7 @@ public class MouseEmulationEngine {
             }
         };
 
-        swipeGestureCooldown.start();
+        swipeGestureCoolDown.start();
 
         momentumStack += 1;
 
