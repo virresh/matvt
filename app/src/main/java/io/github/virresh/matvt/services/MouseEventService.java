@@ -15,6 +15,7 @@ import io.github.virresh.matvt.helper.KeyDetection;
 import io.github.virresh.matvt.view.OverlayView;
 
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
+import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.confirmKey;
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpeed;
 
 public class MouseEventService extends AccessibilityService {
@@ -44,6 +45,7 @@ public class MouseEventService extends AccessibilityService {
         super.onServiceConnected();
         Log.i(TAG_NAME, "Starting service initialization sequence. App version " + BuildConfig.VERSION_NAME);
         bossKey = KeyEvent.KEYCODE_VOLUME_MUTE;
+        confirmKey = KeyEvent.KEYCODE_DPAD_CENTER;
         PointerControl.isBordered = Helper.getMouseBordered(this);
         scrollSpeed = Helper.getScrollSpeed(this);
         MouseEmulationEngine.isBossKeyDisabled = Helper.isBossKeyDisabled(this);
