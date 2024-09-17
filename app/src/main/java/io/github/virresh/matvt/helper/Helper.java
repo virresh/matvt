@@ -18,6 +18,7 @@ public class Helper {
     static final String PREFS_ID = "MATVT";
     static final String PREF_KEY_CB_OVERRIDE_STAT = "CB_OVERRIDE_STAT";
     static final String PREF_KEY_CB_OVERRIDE_VAL = "CB_OVERRIDE_VAL";
+    static final String PREF_KEY_CFB_OVERRIDE_VAL = "CFB_OVERRIDE_VAL";
     static final String PREF_KEY_MOUSE_ICON = "MOUSE_ICON";
     static final String PREF_KEY_MOUSE_SIZE = "MOUSE_SIZE";
     static final String PREF_KEY_SCROLL_SPEED = "SCROLL_SPEED";
@@ -69,11 +70,24 @@ public class Helper {
         return sp.getInt(PREF_KEY_CB_OVERRIDE_VAL, 164);
     }
 
+    public static int getConfirmKeyValue(Context ctx) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        return sp.getInt(PREF_KEY_CFB_OVERRIDE_VAL, 23);
+    }
+
     @SuppressLint("ApplySharedPref")
     public static void setBossKeyValue(Context ctx, int val) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt(PREF_KEY_CB_OVERRIDE_VAL, val);
+        editor.commit();
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void setConfirmKeyValue(Context ctx, int val) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_ID, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(PREF_KEY_CFB_OVERRIDE_VAL, val);
         editor.commit();
     }
 

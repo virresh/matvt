@@ -28,6 +28,7 @@ import io.github.virresh.matvt.helper.Helper;
 import io.github.virresh.matvt.helper.KeyDetection;
 
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.bossKey;
+import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.confirmKey;
 import static io.github.virresh.matvt.engine.impl.MouseEmulationEngine.scrollSpeed;
 
 public class GuiActivity extends AppCompatActivity {
@@ -35,8 +36,8 @@ public class GuiActivity extends AppCompatActivity {
     CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
 
-    EditText et_override;
-    Button bt_saveBossKeyValue;
+    EditText et_override, et_override2;
+    Button bt_saveBossKeyValue, bt_saveConfirmKeyValue;
 
     Spinner sp_mouse_icon;
     SeekBar dsbar_mouse_size;
@@ -58,6 +59,9 @@ public class GuiActivity extends AppCompatActivity {
 
         bt_saveBossKeyValue = findViewById(R.id.bt_saveBossKey);
         et_override = findViewById(R.id.et_override);
+
+        bt_saveConfirmKeyValue = findViewById(R.id.bt_saveConfirmKey);
+        et_override2 = findViewById(R.id.et_override2);
 
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
         cb_disable_bossKey = findViewById(R.id.cb_disable_bossKey);
@@ -89,7 +93,17 @@ public class GuiActivity extends AppCompatActivity {
             Toast.makeText(this, "New Boss key is : "+keyValue, Toast.LENGTH_SHORT).show();
         });
 
-
+        bt_saveConfirmKeyValue.setOnClickListener(view -> {
+            String dat = et_override2.getText().toString();
+            dat = dat.replaceAll("[^0-9]", "");
+            int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_ENTER;
+            else keyValue = Integer.parseInt(dat);
+            isConfirmKeyChanged();
+            Helper.setOverrideStatus(this, isConfirmKeyChanged());
+            Helper.setConfirmKeyValue(this, keyValue);
+            confirmKey = keyValue;
+            Toast.makeText(this, "New confirm key is : "+keyValue, Toast.LENGTH_SHORT).show();
+        });
 
         sp_mouse_icon.setOnItemSelectedListener(new OnItemSelectedListener() {
             // the listener is set after setting initial value to avoid echo if any
@@ -165,10 +179,16 @@ public class GuiActivity extends AppCompatActivity {
         return Helper.getBossKeyValue(this) != 164;
     }
 
+    private boolean isConfirmKeyChanged() {
+        return Helper.getBossKeyValue(this) != 23;
+    }
+
     private void checkValues(IconStyleSpinnerAdapter adapter) {
         Context ctx = getApplicationContext();
         String val = String.valueOf(Helper.getBossKeyValue(ctx));
         et_override.setText(val);
+        String val2 = String.valueOf(Helper.getConfirmKeyValue(ctx));
+        et_override2.setText(val2);
         String iconStyle = Helper.getMouseIconPref(ctx);
         sp_mouse_icon.setSelection(adapter.getPosition(iconStyle));
 
@@ -261,6 +281,8 @@ public class GuiActivity extends AppCompatActivity {
 
         if (et_override != null)
             et_override.setText(Helper.getBossKeyValue(this)+"");
+        if (et_override2 != null)
+            et_override2.setText(Helper.getConfirmKeyValue(this)+"");
     }
 
     private void checkServiceStatus() {
