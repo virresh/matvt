@@ -36,7 +36,7 @@ public class GuiActivity extends AppCompatActivity {
     CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
 
-    EditText et_override, et_override2;
+    EditText et_boss_override, et_confirm_override;
     Button bt_saveBossKeyValue, bt_saveConfirmKeyValue;
 
     Spinner sp_mouse_icon;
@@ -58,10 +58,10 @@ public class GuiActivity extends AppCompatActivity {
         gui_about = findViewById(R.id.gui_about);
 
         bt_saveBossKeyValue = findViewById(R.id.bt_saveBossKey);
-        et_override = findViewById(R.id.et_override);
+        et_boss_override = findViewById(R.id.et_boss_override);
 
         bt_saveConfirmKeyValue = findViewById(R.id.bt_saveConfirmKey);
-        et_override2 = findViewById(R.id.et_override2);
+        et_confirm_override = findViewById(R.id.et_confirm_override);
 
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
         cb_disable_bossKey = findViewById(R.id.cb_disable_bossKey);
@@ -82,7 +82,7 @@ public class GuiActivity extends AppCompatActivity {
         checkValues(iconStyleSpinnerAdapter);
 
         bt_saveBossKeyValue.setOnClickListener(view -> {
-            String dat = et_override.getText().toString();
+            String dat = et_boss_override.getText().toString();
             dat = dat.replaceAll("[^0-9]", "");
             int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_VOLUME_MUTE;
             else keyValue = Integer.parseInt(dat);
@@ -94,7 +94,7 @@ public class GuiActivity extends AppCompatActivity {
         });
 
         bt_saveConfirmKeyValue.setOnClickListener(view -> {
-            String dat = et_override2.getText().toString();
+            String dat = et_confirm_override.getText().toString();
             dat = dat.replaceAll("[^0-9]", "");
             int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_ENTER;
             else keyValue = Integer.parseInt(dat);
@@ -186,9 +186,9 @@ public class GuiActivity extends AppCompatActivity {
     private void checkValues(IconStyleSpinnerAdapter adapter) {
         Context ctx = getApplicationContext();
         String val = String.valueOf(Helper.getBossKeyValue(ctx));
-        et_override.setText(val);
+        et_boss_override.setText(val);
         String val2 = String.valueOf(Helper.getConfirmKeyValue(ctx));
-        et_override2.setText(val2);
+        et_confirm_override.setText(val2);
         String iconStyle = Helper.getMouseIconPref(ctx);
         sp_mouse_icon.setSelection(adapter.getPosition(iconStyle));
 
@@ -279,10 +279,10 @@ public class GuiActivity extends AppCompatActivity {
         //Checking services status
         checkServiceStatus();
 
-        if (et_override != null)
-            et_override.setText(Helper.getBossKeyValue(this)+"");
-        if (et_override2 != null)
-            et_override2.setText(Helper.getConfirmKeyValue(this)+"");
+        if (et_boss_override != null)
+            et_boss_override.setText(Helper.getBossKeyValue(this)+"");
+        if (et_confirm_override != null)
+            et_confirm_override.setText(Helper.getConfirmKeyValue(this)+"");
     }
 
     private void checkServiceStatus() {
