@@ -9,9 +9,9 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -21,11 +21,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.github.virresh.matvt.BuildConfig;
-
 import io.github.virresh.matvt.R;
-import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
-import io.github.virresh.matvt.engine.impl.PointerControl;
-import io.github.virresh.matvt.helper.Helper;
+import io.github.virresh.matvt.helper.AccessibilityUtils;
+import io.github.virresh.matvt.helper.AppPreferences;
+
 import io.github.virresh.matvt.helper.KeyDetection;
 import io.github.virresh.matvt.services.MouseEventService;
 
@@ -44,6 +43,7 @@ public class GuiActivity extends AppCompatActivity {
     SeekBar dsbar_scroll_speed;
 
     MouseEventService mService;
+    private AppPreferences appPreferences;
 
     public static final int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 701;
     public static final int ACTION_ACCESSIBILITY_PERMISSION_REQUEST_CODE = 702;
@@ -51,7 +51,7 @@ public class GuiActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Helper.helperContext = this;
+        appPreferences = new AppPreferences(this);
         mService = MouseEventService.getInstance();
         setContentView(R.layout.activity_main_gui);
         gui_acc_perm = findViewById(R.id.gui_acc_perm);
@@ -81,27 +81,30 @@ public class GuiActivity extends AppCompatActivity {
 
         checkValues(iconStyleSpinnerAdapter);
 
-        bt_saveBossKeyValue.setOnClickListener(view -> {
-            String dat = et_override.getText().toString();
-            dat = dat.replaceAll("[^0-9]", "");
-            int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_VOLUME_MUTE;
-            else keyValue = Integer.parseInt(dat);
-            isBossKeyChanged();
-            Helper.setOverrideStatus(this, isBossKeyChanged());
-            Helper.setBossKeyValue(this, keyValue);
-            Toast.makeText(this, "New Boss key is : "+keyValue, Toast.LENGTH_SHORT).show();
-            updateFromPreferences();
+        bt_saveBossKeyValue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String dat = et_override.getText().toString();
+                dat = dat.replaceAll("[^0-9]", "");
+                int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_VOLUME_MUTE;
+                else keyValue = Integer.parseInt(dat);
+                isBossKeyChanged();
+                appPreferences.setOverrideStatus(isBossKeyChanged());
+                appPreferences.setBossKeyValue(keyValue);
+                Toast.makeText(GuiActivity.this, "New Boss key is : "+keyValue, Toast.LENGTH_SHORT).show();
+                updateFromPreferences();
+            }
         });
 
 
 
-        sp_mouse_icon.setOnItemSelectedListener(new OnItemSelectedListener() {
+        sp_mouse_icon.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             // the listener is set after setting initial value to avoid echo if any
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
                 Context ctx = getApplicationContext();
                 String style = iconStyleSpinnerAdapter.getItem(pos);
-                Helper.setMouseIconPref(ctx, iconStyleSpinnerAdapter.getItem(pos));
+                appPreferences.setMouseIconPref(iconStyleSpinnerAdapter.getItem(pos));
                 updateFromPreferences();
             }
 
@@ -115,7 +118,7 @@ public class GuiActivity extends AppCompatActivity {
                 if (fromUser) {
                     // do not do anything if the progress change was done programmatically
                     Context ctx = getApplicationContext();
-                    Helper.setMouseSizePref(ctx, progress);
+                    appPreferences.setMouseSizePref(progress);
                     updateFromPreferences();
                 }
             }
@@ -133,7 +136,7 @@ public class GuiActivity extends AppCompatActivity {
                 if (fromUser) {
                     // do not do anything if the progress change was done programmatically
                     Context ctx = getApplicationContext();
-                    Helper.setScrollSpeed(ctx, progress);
+                    appPreferences.setScrollSpeed(progress);
                     updateFromPreferences();
                 }
             }
@@ -145,71 +148,85 @@ public class GuiActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        cb_mouse_bordered.setOnCheckedChangeListener((compoundButton, b) -> {
-            Helper.setMouseBordered(getApplicationContext(), b);
-            updateFromPreferences();
+        cb_mouse_bordered.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                appPreferences.setMouseBordered(b);
+                updateFromPreferences();
+            }
         });
 
-        cb_disable_bossKey.setOnCheckedChangeListener(((compoundButton, value) -> {
-            Helper.setBossKeyDisabled(getApplicationContext(), value);
-            updateFromPreferences();
-        }));
+        cb_disable_bossKey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean value) {
+                appPreferences.setBossKeyDisabled(value);
+                updateFromPreferences();
+            }
+        });
 
-        cb_behaviour_bossKey.setOnCheckedChangeListener((((compoundButton, value) -> {
-            Helper.setBossKeyBehaviour(getApplicationContext(), value);
-            updateFromPreferences();
-        })));
+        cb_behaviour_bossKey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean value) {
+                appPreferences.setBossKeyBehaviour(value);
+                updateFromPreferences();
+            }
+        });
 
         populateText();
-        findViewById(R.id.gui_setup_perm).setOnClickListener(view -> askPermissions());
+        findViewById(R.id.gui_setup_perm).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                askPermissions();
+            }
+        });
     }
 
     private boolean isBossKeyChanged() {
-        return Helper.getBossKeyValue(this) != 164;
+        return appPreferences.getBossKeyValue() != 164;
     }
 
     private void checkValues(IconStyleSpinnerAdapter adapter) {
         Context ctx = getApplicationContext();
-        String val = String.valueOf(Helper.getBossKeyValue(ctx));
+        String val = String.valueOf(appPreferences.getBossKeyValue());
         et_override.setText(val);
-        String iconStyle = Helper.getMouseIconPref(ctx);
+        String iconStyle = appPreferences.getMouseIconPref();
         sp_mouse_icon.setSelection(adapter.getPosition(iconStyle));
 
-        int mouseSize = Helper.getMouseSizePref(ctx);
+        int mouseSize = appPreferences.getMouseSizePref();
         dsbar_mouse_size.setProgress(Math.max(Math.min(mouseSize, dsbar_mouse_size.getMax()), 0));
 
-        int scrollSpeed = Helper.getScrollSpeed(ctx);
+        int scrollSpeed = appPreferences.getScrollSpeed();
         dsbar_scroll_speed.setProgress(Math.max(Math.min(scrollSpeed, dsbar_scroll_speed.getMax()), 0));
 
-        boolean bordered = Helper.getMouseBordered(ctx);
+        boolean bordered = appPreferences.getMouseBordered();
         cb_mouse_bordered.setChecked(bordered);
 
-        boolean bossKeyStatus = Helper.isBossKeyDisabled(ctx);
+        boolean bossKeyStatus = appPreferences.isBossKeyDisabled();
         cb_disable_bossKey.setChecked(bossKeyStatus);
 
-        boolean bossKeyBehaviour = Helper.isBossKeySetToToggle(ctx);
+        boolean bossKeyBehaviour = appPreferences.isBossKeySetToToggle();
         cb_behaviour_bossKey.setChecked(bossKeyBehaviour);
     }
 
     private void askPermissions() {
-        if (Helper.isOverlayDisabled(this)) {
+        if (AccessibilityUtils.isOverlayDisabled(this)) {
             try {
-                startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION),
+                startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION), 
                         ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
             } catch (Exception unused) {
                 Toast.makeText(this, "Overlay Permission Handler not Found", Toast.LENGTH_SHORT).show();
             }
         }
-        if (!Helper.isOverlayDisabled(this) && Helper.isAccessibilityDisabled(this)) {
+        if (!AccessibilityUtils.isOverlayDisabled(this) && AccessibilityUtils.isAccessibilityDisabled(this)) {
             checkAccPerms();
         }
     }
 
     private void checkAccPerms() {
-        if (Helper.isAccessibilityDisabled(this))
+        if (AccessibilityUtils.isAccessibilityDisabled(this))
             try {
-//                startActivity(new Intent(getPackageManager().getLeanbackLaunchIntentForPackage("com.wolf.apm").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))); HELPER APP
-                startActivityForResult(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS),
+//                startActivity(new Intent(getPackageManager().getLeanbackLaunchIntentForPackage("com.wolf.apm")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))); HELPER APP
+                startActivityForResult(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS), 
                         ACTION_ACCESSIBILITY_PERMISSION_REQUEST_CODE);
             } catch (Exception exception) {
                 Toast.makeText(this, "Acessibility Handler not Found", Toast.LENGTH_SHORT).show();
@@ -217,23 +234,23 @@ public class GuiActivity extends AppCompatActivity {
     }
 
     public void populateText() {
-        if (Helper.isOverlayDisabled(this))  gui_overlay_perm.setText(R.string.perm_overlay_denied);
+        if (AccessibilityUtils.isOverlayDisabled(this))  gui_overlay_perm.setText(R.string.perm_overlay_denied);
         else gui_overlay_perm.setText(R.string.perm_overlay_allowed);
 
-        if (Helper.isAccessibilityDisabled(this)) {
+        if (AccessibilityUtils.isAccessibilityDisabled(this)) {
             gui_acc_perm.setText(R.string.perm_acc_denied);
             gui_acc_serv.setText(R.string.serv_acc_denied);
-            gui_overlay_serv.setText(R.string.serv_overlay_denied); }
+            gui_overlay_serv.setText(R.string.serv_overlay_denied); } 
         else gui_acc_perm.setText(R.string.perm_acc_allowed);
 
-        if (Helper.isAccessibilityDisabled(this) && Helper.isOverlayDisabled(this)) {
+        if (AccessibilityUtils.isAccessibilityDisabled(this) && AccessibilityUtils.isOverlayDisabled(this)) {
             gui_acc_perm.setText(R.string.perm_acc_denied);
             gui_acc_serv.setText(R.string.serv_acc_denied);
             gui_overlay_perm.setText(R.string.perm_overlay_denied);
             gui_overlay_serv.setText(R.string.serv_overlay_denied);
         }
 
-        if (!Helper.isAccessibilityDisabled(this) && !Helper.isOverlayDisabled(this)) {
+        if (!AccessibilityUtils.isAccessibilityDisabled(this) && !AccessibilityUtils.isOverlayDisabled(this)) {
             gui_acc_perm.setText(R.string.perm_acc_allowed);
             gui_acc_serv.setText(R.string.serv_acc_allowed);
             gui_overlay_perm.setText(R.string.perm_overlay_allowed);
@@ -247,11 +264,11 @@ public class GuiActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
-            if (Helper.isOverlayDisabled(this)) {
+            if (AccessibilityUtils.isOverlayDisabled(this)) {
                 Toast.makeText(this, "Overlay Permissions Denied", Toast.LENGTH_SHORT).show();
             } else checkAccPerms();
         if (requestCode == ACTION_ACCESSIBILITY_PERMISSION_REQUEST_CODE)
-            if (Helper.isAccessibilityDisabled(this)) {
+            if (AccessibilityUtils.isAccessibilityDisabled(this)) {
                 Toast.makeText(this, "Accessibility Services not running", Toast.LENGTH_SHORT).show();
             }
     }
@@ -263,14 +280,14 @@ public class GuiActivity extends AppCompatActivity {
         checkServiceStatus();
 
         if (et_override != null)
-            et_override.setText(Helper.getBossKeyValue(this)+"");
+            et_override.setText(appPreferences.getBossKeyValue()+"");
     }
 
     private void checkServiceStatus() {
         //checking for changed every 2 sec
         repopulate = new CountDownTimer(2000, 2000) {
             @Override
-            public void onTick(long l) { }
+            public void onTick(long l) { } 
             @Override
             public void onFinish() {
                 populateText();

@@ -1,6 +1,5 @@
 package io.github.virresh.matvt.view;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -13,7 +12,7 @@ import androidx.core.content.ContextCompat;
 
 import io.github.virresh.matvt.R;
 import io.github.virresh.matvt.gui.IconStyleSpinnerAdapter;
-import io.github.virresh.matvt.helper.Helper;
+import io.github.virresh.matvt.helper.AppPreferences;
 
 /**
  * Draw a Mouse Cursor on screen
@@ -29,9 +28,11 @@ public class MouseCursorView extends View {
 
     private int pointerOffsetX;
     private int pointerOffsetY;
+    private final AppPreferences appPreferences;
 
-    public MouseCursorView(Context context) {
+    public MouseCursorView(Context context, AppPreferences appPreferences) {
         super(context);
+        this.appPreferences = appPreferences;
         setWillNotDraw(false);
         mPointerLocation = new PointF();
         mPaintBox = new Paint();
@@ -48,11 +49,11 @@ public class MouseCursorView extends View {
 
     public void updateFromPreferences() {
         Context ctx = getContext();
-        String iconStr = Helper.getMouseIconPref(ctx);
+        String iconStr = appPreferences.getMouseIconPref();
         pointerDrawableReference = IconStyleSpinnerAdapter.textToResourceIdMap.getOrDefault(iconStr, R.drawable.pointer);
         pointerOffsetX = IconStyleSpinnerAdapter.textToOffsetX.getOrDefault(iconStr, 0);
         pointerOffsetY = IconStyleSpinnerAdapter.textToOffsetY.getOrDefault(iconStr, 0);
-        pointerSizeReference = Helper.getMouseSizePref(ctx) + 1;
+        pointerSizeReference = appPreferences.getMouseSizePref() + 1;
         setBitmap(getContext());
     }
 
