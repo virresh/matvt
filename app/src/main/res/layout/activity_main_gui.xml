@@ -205,6 +205,35 @@
                 android:spinnerMode="dropdown" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/engine_type"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.20"
+                android:text="Mouse Engine"
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="20.0sp" />
+
+            <Spinner
+                android:id="@+id/sp_engine_type"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.80"
+                android:drawSelectorOnTop="true"
+                android:popupBackground="@drawable/focus_selector"
+                android:dropDownWidth="match_parent"
+                android:nextFocusUp="@id/sp_mouse_icon"
+                android:nextFocusDown="@id/cb_border_window"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
         <CheckBox
             android:id="@+id/cb_border_window"
             android:layout_width="match_parent"
@@ -218,13 +247,25 @@
             android:textSize="20sp" />
 
         <CheckBox
+            android:id="@+id/cb_hide_toasts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layoutDirection="rtl"
+            android:nextFocusUp="@id/cb_border_window"
+            android:buttonTint="@color/white"
+            android:text="Hide toast messages (Recommended for smaller displays)"
+            android:textColor="@color/white"
+            android:textSize="20sp"/>
+
+        <CheckBox
             android:id="@+id/cb_disable_bossKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:buttonTint="@color/white"
             android:layoutDirection="rtl"
-            android:nextFocusUp="@id/cb_border_window"
+            android:nextFocusUp="@id/cb_hide_toasts"
             android:text="Disable Boss Key (useful for full size remotes)"
             android:textColor="@color/white"
             android:textSize="20sp" />

@@ -288,16 +288,24 @@ public abstract class BaseEngine implements MouseEmulationEngine {
         switch (newMode) {
             case DPAD:
                 mPointerControl.disappear();
-                Toast.makeText(mService, "D-Pad Mode", Toast.LENGTH_SHORT).show();
+                showToast("D-Pad Mode");
                 break;
             case MOUSE:
                 mPointerControl.reset();
                 mPointerControl.reappear();
-                Toast.makeText(mService, "Mouse Mode", Toast.LENGTH_SHORT).show();
+                showToast("Mouse Mode");
                 break;
             case SCROLL:
-                Toast.makeText(mService, "Scroll Mode", Toast.LENGTH_SHORT).show();
+                showToast("Scroll Mode");
                 break;
+        }
+    }
+
+    private void showToast(String message) {
+        if (mService != null && !appPreferences.isHideToastOptionEnabled()) {
+            Toast.makeText(mService, message, Toast.LENGTH_SHORT).show();
+        } else {
+            Log.i(LOG_TAG, message);
         }
     }
 

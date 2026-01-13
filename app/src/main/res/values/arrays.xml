@@ -1,0 +1,7 @@
+<resources>
+    <string-array name="engine_types">
+        <item>gesture</item>
+        <item>shell</item>
+        <item>hybrid</item>
+    </string-array>
+</resources>

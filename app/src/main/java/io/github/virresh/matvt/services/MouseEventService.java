@@ -11,7 +11,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import io.github.virresh.matvt.BuildConfig;
 import io.github.virresh.matvt.engine.impl.GestureDispatchMouseEngine;
+import io.github.virresh.matvt.engine.impl.HybridMouseEngine;
 import io.github.virresh.matvt.engine.impl.MouseEmulationEngine;
+import io.github.virresh.matvt.engine.impl.ShellInputDispatchMouseEngine;
 import io.github.virresh.matvt.helper.AccessibilityUtils;
 import io.github.virresh.matvt.helper.AppPreferences;
 import io.github.virresh.matvt.helper.KeyDetection;
@@ -87,7 +89,21 @@ public class MouseEventService extends AccessibilityService {
             this.setServiceInfo(asi);
         }
 
-        mEngine = new GestureDispatchMouseEngine(this, mOverlayView, appPreferences, mMouseCursorView);
+        String engineType = appPreferences.getEngineType();
+        Log.i(TAG_NAME, "Selected engine type: " + engineType);
+
+        switch (engineType) {
+            case "shell":
+                mEngine = new ShellInputDispatchMouseEngine(appPreferences, mOverlayView, mMouseCursorView);
+                break;
+            case "hybrid":
+                mEngine = new HybridMouseEngine(appPreferences, mOverlayView, mMouseCursorView);
+                break;
+            case "gesture":
+            default:
+                mEngine = new GestureDispatchMouseEngine(this, mOverlayView, appPreferences, mMouseCursorView);
+                break;
+        }
         mEngine.init(this);
     }
 

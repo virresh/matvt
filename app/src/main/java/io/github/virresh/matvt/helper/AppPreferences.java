@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 
 public class AppPreferences {
     private static final String PREFS_ID = "MATVT";
+    private static final String PREF_ALERTS_HIDE_TOASTS = "HIDE_ALERTS";
     private static final String PREF_KEY_CB_OVERRIDE_STAT = "CB_OVERRIDE_STAT";
     private static final String PREF_KEY_CB_OVERRIDE_VAL = "CB_OVERRIDE_VAL";
     private static final String PREF_KEY_MOUSE_ICON = "MOUSE_ICON";
@@ -15,6 +16,7 @@ public class AppPreferences {
     private static final String PREF_KEY_MOUSE_BORDERED = "MOUSE_BORDERED";
     private static final String PREF_KEY_CB_DISABLE_BOSSKEY = "DISABLE_BOSSKEY";
     private static final String PREF_KEY_CB_BEHAVIOUR_BOSSKEY = "CB_BEHAVIOUR_BOSSKEY";
+    private static final String PREF_KEY_ENGINE_TYPE = "ENGINE_TYPE";
 
     private final SharedPreferences sharedPreferences;
 
@@ -91,5 +93,21 @@ public class AppPreferences {
 
     public boolean isBossKeySetToToggle() {
         return sharedPreferences.getBoolean(PREF_KEY_CB_BEHAVIOUR_BOSSKEY, false);
+    }
+    
+    public void setHideToastsOptionEnabled(boolean val){
+        sharedPreferences.edit().putBoolean(PREF_ALERTS_HIDE_TOASTS,val).apply();
+    }
+
+    public boolean isHideToastOptionEnabled(){
+        return sharedPreferences.getBoolean(PREF_ALERTS_HIDE_TOASTS, false);
+    }
+
+    public String getEngineType() {
+        return sharedPreferences.getString(PREF_KEY_ENGINE_TYPE, "gesture");
+    }
+
+    public void setEngineType(String val) {
+        sharedPreferences.edit().putString(PREF_KEY_ENGINE_TYPE, val).apply();
     }
 }

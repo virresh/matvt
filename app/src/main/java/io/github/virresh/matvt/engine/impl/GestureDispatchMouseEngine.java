@@ -2,32 +2,18 @@ package io.github.virresh.matvt.engine.impl;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
-import android.content.Context;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.view.accessibility.AccessibilityWindowInfo;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import io.github.virresh.matvt.BuildConfig;
 import io.github.virresh.matvt.helper.AppPreferences;
-
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 
@@ -36,8 +22,9 @@ public class GestureDispatchMouseEngine extends BaseEngine {
 
     private static String LOG_TAG = "GESTURE_MOUSE_EMULATION";
 
-    public GestureDispatchMouseEngine(Context c, OverlayView ov, AppPreferences appPreferences, MouseCursorView mouseCursorView) {
+    public GestureDispatchMouseEngine(AccessibilityService service, OverlayView ov, AppPreferences appPreferences, MouseCursorView mouseCursorView) {
         super(appPreferences, ov, mouseCursorView);
+        this.mService = service;
     }
 
     @Override

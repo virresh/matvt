@@ -1,7 +1,7 @@
 package io.github.virresh.matvt.engine.impl;
 
 import android.accessibilityservice.AccessibilityService;
-import android.content.Context;
+import android.graphics.PointF;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -29,35 +29,18 @@ import io.github.virresh.matvt.helper.AppPreferences;
 import io.github.virresh.matvt.view.MouseCursorView;
 import io.github.virresh.matvt.view.OverlayView;
 
-public class ShellInputDispatchMouseEngine implements MouseEmulationEngine {
+public class ShellInputDispatchMouseEngine extends BaseEngine {
 
-    private MouseEmulationEngine mEngine;
     private Handler adbHandler;
     private Handler mainHandler;
     private HandlerThread adbThread;
 
     private AdbCrypto adbCrypto;
 
-    private final int momentumStack;
-
     private static final String TAG_NAME = "MATVT_ADB_ENGINE";
 
-    // service which started this engine
-    private AccessibilityService mService;
-
-    private final PointerControl mPointerControl;
-    protected final AppPreferences appPreferences;
-
-
-    public ShellInputDispatchMouseEngine (Context c, OverlayView ov, AppPreferences appPreferences) {
-        this.appPreferences = appPreferences;
-        momentumStack = 0;
-        // overlay view for drawing mouse
-        MouseCursorView mCursorView = new MouseCursorView(c, appPreferences);
-        ov.addFullScreenLayer(mCursorView);
-        mPointerControl = new PointerControl(ov, mCursorView);
-        mPointerControl.disappear();
-        Log.i(TAG_NAME, "X, Y: " + mPointerControl.getPointerLocation().x + ", " + mPointerControl.getPointerLocation().y);
+    public ShellInputDispatchMouseEngine (AppPreferences appPreferences, OverlayView ov, MouseCursorView mCursorView) {
+        super(appPreferences, ov, mCursorView);
     }
 
     private void sendShellInput(String command) {
@@ -123,7 +106,7 @@ public class ShellInputDispatchMouseEngine implements MouseEmulationEngine {
 
     @Override
     public void init(@NonNull AccessibilityService s) {
-        this.mService = s;
+        super.init(s);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             try {
                 adbCrypto = AdbKeyManager.getAdbCryptoKey(s.getApplicationContext());
@@ -141,16 +124,34 @@ public class ShellInputDispatchMouseEngine implements MouseEmulationEngine {
     }
 
     @Override
-    public void updateFromPreferences() {
+    protected int scroll(KeyEvent ke) {
+        if (mService != null && scrollCodeMap.containsKey(ke.getKeyCode())) {
+            PointF pointer = mPointerControl.getPointerLocation();
+            int direction = scrollCodeMap.get(ke.getKeyCode());
+            int momentum = momentumStack; // from BaseEngine
+            final int DURATION = scrollSpeed + 20; // scrollSpeed from BaseEngine
 
+            PointF lineDirection = new PointF(
+                    pointer.x + (momentum + 75) * PointerControl.dirX[direction],
+                    pointer.y + (momentum + 75) * PointerControl.dirY[direction]);
+
+            shellSwipe((int) pointer.x, (int) pointer.y, (int) lineDirection.x, (int) lineDirection.y, DURATION);
+        }
+        return 0;
     }
 
     @Override
-    public boolean perform(KeyEvent keyEvent) {
-        return false;
+    protected int click(KeyEvent ke) {
+        if (mService != null) {
+            PointF pointer = mPointerControl.getPointerLocation();
+            shellTap((int) pointer.x, (int) pointer.y);
+        }
+        return 0;
     }
 
+    @Override
     public void destroy() {
+        super.destroy();
         if (adbThread != null) {
             adbThread.quitSafely();
         }

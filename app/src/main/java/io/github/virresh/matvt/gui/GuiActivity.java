@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Arrays;
 
 import io.github.virresh.matvt.BuildConfig;
 import io.github.virresh.matvt.R;
@@ -32,13 +35,13 @@ public class GuiActivity extends AppCompatActivity {
     private static final String TAG_NAME = "MATVT_SERVICE";
 
     CountDownTimer repopulate;
-    CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey;
+    CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey, cb_hide_toasts;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
 
     EditText et_override;
     Button bt_saveBossKeyValue;
 
-    Spinner sp_mouse_icon;
+    Spinner sp_mouse_icon, sp_engine_type;
     SeekBar dsbar_mouse_size;
     SeekBar dsbar_scroll_speed;
 
@@ -64,10 +67,12 @@ public class GuiActivity extends AppCompatActivity {
         et_override = findViewById(R.id.et_override);
 
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
+        cb_hide_toasts = findViewById(R.id.cb_hide_toasts);
         cb_disable_bossKey = findViewById(R.id.cb_disable_bossKey);
         cb_behaviour_bossKey = findViewById(R.id.cb_behaviour_bossKey);
 
         sp_mouse_icon = findViewById(R.id.sp_mouse_icon);
+        sp_engine_type = findViewById(R.id.sp_engine_type);
         dsbar_mouse_size = findViewById(R.id.dsbar_mouse_size);
         dsbar_scroll_speed = findViewById(R.id.dsbar_mouse_scspeed);
 
@@ -79,7 +84,13 @@ public class GuiActivity extends AppCompatActivity {
         IconStyleSpinnerAdapter iconStyleSpinnerAdapter = new IconStyleSpinnerAdapter(this, R.layout.spinner_icon_text_gui, R.id.textView, IconStyleSpinnerAdapter.getResourceList());
         sp_mouse_icon.setAdapter(iconStyleSpinnerAdapter);
 
-        checkValues(iconStyleSpinnerAdapter);
+        // render engine type dropdown
+        ArrayAdapter<CharSequence> engineTypeAdapter = ArrayAdapter.createFromResource(this,
+                R.array.engine_types, android.R.layout.simple_spinner_item);
+        engineTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp_engine_type.setAdapter(engineTypeAdapter);
+
+        checkValues(iconStyleSpinnerAdapter, engineTypeAdapter);
 
         bt_saveBossKeyValue.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,13 +107,25 @@ public class GuiActivity extends AppCompatActivity {
             }
         });
 
+        sp_engine_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+                String engineType = (String) adapterView.getItemAtPosition(pos);
+                appPreferences.setEngineType(engineType);
+                updateFromPreferences();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
 
         sp_mouse_icon.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             // the listener is set after setting initial value to avoid echo if any
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                Context ctx = getApplicationContext();
                 String style = iconStyleSpinnerAdapter.getItem(pos);
                 appPreferences.setMouseIconPref(iconStyleSpinnerAdapter.getItem(pos));
                 updateFromPreferences();
@@ -117,7 +140,6 @@ public class GuiActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     // do not do anything if the progress change was done programmatically
-                    Context ctx = getApplicationContext();
                     appPreferences.setMouseSizePref(progress);
                     updateFromPreferences();
                 }
@@ -135,7 +157,6 @@ public class GuiActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     // do not do anything if the progress change was done programmatically
-                    Context ctx = getApplicationContext();
                     appPreferences.setScrollSpeed(progress);
                     updateFromPreferences();
                 }
@@ -152,6 +173,14 @@ public class GuiActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 appPreferences.setMouseBordered(b);
+                updateFromPreferences();
+            }
+        });
+
+        cb_hide_toasts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean value) {
+                appPreferences.setHideToastsOptionEnabled(value);
                 updateFromPreferences();
             }
         });
@@ -185,12 +214,14 @@ public class GuiActivity extends AppCompatActivity {
         return appPreferences.getBossKeyValue() != 164;
     }
 
-    private void checkValues(IconStyleSpinnerAdapter adapter) {
-        Context ctx = getApplicationContext();
+    private void checkValues(IconStyleSpinnerAdapter adapter, ArrayAdapter<CharSequence> engineTypeAdapter) {
         String val = String.valueOf(appPreferences.getBossKeyValue());
         et_override.setText(val);
         String iconStyle = appPreferences.getMouseIconPref();
         sp_mouse_icon.setSelection(adapter.getPosition(iconStyle));
+
+        String engineType = appPreferences.getEngineType();
+        sp_engine_type.setSelection(engineTypeAdapter.getPosition(engineType));
 
         int mouseSize = appPreferences.getMouseSizePref();
         dsbar_mouse_size.setProgress(Math.max(Math.min(mouseSize, dsbar_mouse_size.getMax()), 0));
@@ -200,6 +231,9 @@ public class GuiActivity extends AppCompatActivity {
 
         boolean bordered = appPreferences.getMouseBordered();
         cb_mouse_bordered.setChecked(bordered);
+
+        boolean toastVisibility = appPreferences.isHideToastOptionEnabled();
+        cb_hide_toasts.setChecked(toastVisibility);
 
         boolean bossKeyStatus = appPreferences.isBossKeyDisabled();
         cb_disable_bossKey.setChecked(bossKeyStatus);
@@ -250,7 +284,7 @@ public class GuiActivity extends AppCompatActivity {
             gui_overlay_serv.setText(R.string.serv_overlay_denied);
         }
 
-        if (!AccessibilityUtils.isAccessibilityDisabled(this) && !AccessibilityUtils.isOverlayDisabled(this)) {
+        if (!AccessibilityUtils.isAccessibilityDisabled(this) && !AccessibilityUtils.isAccessibilityDisabled(this)) {
             gui_acc_perm.setText(R.string.perm_acc_allowed);
             gui_acc_serv.setText(R.string.serv_acc_allowed);
             gui_overlay_perm.setText(R.string.perm_overlay_allowed);
@@ -287,7 +321,7 @@ public class GuiActivity extends AppCompatActivity {
         //checking for changed every 2 sec
         repopulate = new CountDownTimer(2000, 2000) {
             @Override
-            public void onTick(long l) { } 
+            public void onTick(long l) { }
             @Override
             public void onFinish() {
                 populateText();
