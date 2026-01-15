@@ -139,6 +139,8 @@ All kinds of contributions are welcome. Two ways of contributing:
 # Credits
 Thanks to EVA Facial Mouse for open sourcing their code. I've taken lots of ideas from their codebase. You can check them out at https://github.com/cmauri/eva_facial_mouse  
 Thanks to [@sweenwolf](https://github.com/sweenwolf) for making this app work on remotes with less buttons, and for the app icons, fully transparent cursor images, boss key autodetect and autoscroll on borders!    
+Thanks to [@aquirozc](https://github.com/aquirozc) for helping with scroll stability and toast message hiding.    
+Thanks to [@ariehcore](https://github.com/ariehcore) for helping with confirm key option.    
 Thanks to TechDoctorUK for making a demo video  
 Thanks to @hotcereal_twitter for providing more cursor images. [Link](https://gitter.im/virresh/community?at=6102e7b0d8381a2a839bbcfd).    
 
