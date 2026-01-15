@@ -283,65 +283,65 @@
             android:textSize="20sp" />
 
         <LinearLayout
-            android:weightSum="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:weightSum="1">
 
             <TextView
-                android:textAlignment="center"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:textSize="20sp"
-                android:layout_weight="0.20"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white_2"
-                android:text="Boss Key"/>
-
-            <EditText
-                android:textAlignment="center"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
-                android:id="@+id/et_override"
+                android:layout_weight="0.20"
+                android:text="Boss Key"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white_2"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/et_boss_override"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
                 android:layout_weight="0.20"
                 android:buttonTint="@color/white"
                 android:hint="(Default: 164)"
                 android:inputType="number"
                 android:nextFocusRight="@id/bt_detect"
+                android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textColorHint="@color/white_2"
                 android:textSize="20sp"
                 tools:ignore="RtlCompat" />
 
             <Button
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:onClick="callDetect"
                 android:id="@+id/bt_detect"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
                 android:layout_weight="0.30"
                 android:background="@drawable/bg_button"
                 android:buttonTint="@color/white"
-                android:nextFocusLeft="@id/et_override"
+                android:nextFocusLeft="@id/et_boss_override"
                 android:nextFocusRight="@id/bt_saveBossKey"
+                android:onClick="callDetect"
                 android:text="DETECT"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
 
 
             <Button
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
                 android:id="@+id/bt_saveBossKey"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
                 android:layout_weight="0.30"
                 android:background="@drawable/bg_button"
                 android:buttonTint="@color/white"
@@ -351,5 +351,60 @@
                 android:textSize="20sp" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="0.20"
+                android:text="Confirm Key"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white_2"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/et_confirm_override"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="0.20"
+                android:buttonTint="@color/white"
+                android:hint="(Default: 23)"
+                android:inputType="number"
+                android:nextFocusRight="@id/bt_saveConfirmKey"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white_2"
+                android:textSize="20sp"
+                tools:ignore="RtlCompat" />
+
+
+            <Button
+                android:id="@+id/bt_saveConfirmKey"
+                android:layout_width="119dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="0.20"
+                android:background="@drawable/bg_button"
+                android:buttonTint="@color/white"
+                android:nextFocusLeft="@id/et_confirm_override"
+                android:text="SAVE"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

@@ -21,13 +21,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Arrays;
-
 import io.github.virresh.matvt.BuildConfig;
 import io.github.virresh.matvt.R;
 import io.github.virresh.matvt.helper.AccessibilityUtils;
 import io.github.virresh.matvt.helper.AppPreferences;
-
 import io.github.virresh.matvt.helper.KeyDetection;
 import io.github.virresh.matvt.services.MouseEventService;
 
@@ -38,8 +35,8 @@ public class GuiActivity extends AppCompatActivity {
     CheckBox cb_mouse_bordered, cb_disable_bossKey, cb_behaviour_bossKey, cb_hide_toasts;
     TextView gui_acc_perm, gui_acc_serv, gui_overlay_perm, gui_overlay_serv, gui_about;
 
-    EditText et_override;
-    Button bt_saveBossKeyValue;
+    EditText et_boss_override, et_confirm_override;
+    Button bt_saveBossKeyValue, bt_saveConfirmKeyValue;
 
     Spinner sp_mouse_icon, sp_engine_type;
     SeekBar dsbar_mouse_size;
@@ -64,7 +61,10 @@ public class GuiActivity extends AppCompatActivity {
         gui_about = findViewById(R.id.gui_about);
 
         bt_saveBossKeyValue = findViewById(R.id.bt_saveBossKey);
-        et_override = findViewById(R.id.et_override);
+        et_boss_override = findViewById(R.id.et_boss_override);
+
+        bt_saveConfirmKeyValue = findViewById(R.id.bt_saveConfirmKey);
+        et_confirm_override = findViewById(R.id.et_confirm_override);
 
         cb_mouse_bordered = findViewById(R.id.cb_border_window);
         cb_hide_toasts = findViewById(R.id.cb_hide_toasts);
@@ -95,14 +95,26 @@ public class GuiActivity extends AppCompatActivity {
         bt_saveBossKeyValue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String dat = et_override.getText().toString();
+                String dat = et_boss_override.getText().toString();
                 dat = dat.replaceAll("[^0-9]", "");
                 int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_VOLUME_MUTE;
                 else keyValue = Integer.parseInt(dat);
-                isBossKeyChanged();
-                appPreferences.setOverrideStatus(isBossKeyChanged());
+                appPreferences.setOverrideStatus(appPreferences.getBossKeyValue() != 164);
                 appPreferences.setBossKeyValue(keyValue);
                 Toast.makeText(GuiActivity.this, "New Boss key is : "+keyValue, Toast.LENGTH_SHORT).show();
+                updateFromPreferences();
+            }
+        });
+
+        bt_saveConfirmKeyValue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String dat = et_confirm_override.getText().toString();
+                dat = dat.replaceAll("[^0-9]", "");
+                int keyValue; if (dat.isEmpty()) keyValue = KeyEvent.KEYCODE_DPAD_CENTER;
+                else keyValue = Integer.parseInt(dat);
+                appPreferences.setConfirmKeyValue(keyValue);
+                Toast.makeText(GuiActivity.this, "New confirm key is : "+keyValue, Toast.LENGTH_SHORT).show();
                 updateFromPreferences();
             }
         });
@@ -210,13 +222,12 @@ public class GuiActivity extends AppCompatActivity {
         });
     }
 
-    private boolean isBossKeyChanged() {
-        return appPreferences.getBossKeyValue() != 164;
-    }
-
     private void checkValues(IconStyleSpinnerAdapter adapter, ArrayAdapter<CharSequence> engineTypeAdapter) {
         String val = String.valueOf(appPreferences.getBossKeyValue());
-        et_override.setText(val);
+        et_boss_override.setText(val);
+        String val2 = String.valueOf(appPreferences.getConfirmKeyValue());
+        et_confirm_override.setText(val2);
+
         String iconStyle = appPreferences.getMouseIconPref();
         sp_mouse_icon.setSelection(adapter.getPosition(iconStyle));
 
@@ -313,8 +324,10 @@ public class GuiActivity extends AppCompatActivity {
         //Checking services status
         checkServiceStatus();
 
-        if (et_override != null)
-            et_override.setText(appPreferences.getBossKeyValue()+"");
+        if (et_boss_override != null)
+            et_boss_override.setText(appPreferences.getBossKeyValue()+"");
+        if (et_confirm_override != null)
+            et_confirm_override.setText(appPreferences.getConfirmKeyValue()+"");
     }
 
     private void checkServiceStatus() {

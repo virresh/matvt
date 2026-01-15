@@ -50,6 +50,8 @@ public abstract class BaseEngine implements MouseEmulationEngine {
 
     public int bossKey;
 
+    public int confirmKey;
+
     protected int scrollSpeed;
 
     public boolean isBossKeyDisabled;
@@ -175,6 +177,7 @@ public abstract class BaseEngine implements MouseEmulationEngine {
         isBossKeyDisabled = appPreferences.isBossKeyDisabled();
         isBossKeySetToToggle = appPreferences.isBossKeySetToToggle();
         bossKey = appPreferences.getBossKeyValue();
+        confirmKey = appPreferences.getConfirmKeyValue();
         boolean isBordered = appPreferences.getMouseBordered();
 
         mPointerControl.setIsBordered(isBordered);
@@ -185,6 +188,7 @@ public abstract class BaseEngine implements MouseEmulationEngine {
         Log.i(LOG_TAG, "Configuration -- Boss Key Toggleable " + isBossKeySetToToggle);
         Log.i(LOG_TAG, "Configuration -- Is Bordered " + isBordered);
         Log.i(LOG_TAG, "Configuration -- Boss Key value " + bossKey);
+        Log.i(LOG_TAG, "Configuration -- Confirm Key value " + confirmKey);
     }
 
     @Override
@@ -255,7 +259,7 @@ public abstract class BaseEngine implements MouseEmulationEngine {
                 else if (movementCodeMap.containsKey(keyEvent.getKeyCode()))
                     attachTimer(movementCodeMap.get(keyEvent.getKeyCode()));
                 consumed = true;
-            } else if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
+            } else if(keyEvent.getKeyCode() == confirmKey) {
                 // just consume this event to prevent propagation
                 DPAD_Center_Init_Point = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
                 DPAD_SELECT_PRESSED = true;
@@ -266,7 +270,7 @@ public abstract class BaseEngine implements MouseEmulationEngine {
             if (actionableKeyMap.contains(keyEvent.getKeyCode()) || keyEvent.getKeyCode() == bossKey) {
                 detachPreviousTimer();
                 consumed = true;
-            } else if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
+            } else if (keyEvent.getKeyCode() == confirmKey) {
                 DPAD_SELECT_PRESSED = false;
                 detachPreviousTimer();
                 Point pInt = new Point((int) mPointerControl.getPointerLocation().x, (int) mPointerControl.getPointerLocation().y);
