@@ -1,6 +1,7 @@
 package io.github.virresh.matvt.engine.impl;
 
 import android.accessibilityservice.AccessibilityService;
+import android.os.CountDownTimer;
 import android.view.KeyEvent;
 import android.widget.Toast;
 import android.util.Log;
@@ -14,6 +15,8 @@ import io.github.virresh.matvt.view.OverlayView;
 public class HybridMouseEngine extends BaseEngine {
 
     private static final String LOG_TAG = "HybridMouseEngine";
+    private CountDownTimer swipeGestureCoolDown;
+    private boolean isQueueEmpty = true;
 
     public HybridMouseEngine(AppPreferences appPreferences, OverlayView ov, MouseCursorView mCursorView) {
         super(appPreferences, ov, mCursorView);
@@ -21,17 +24,33 @@ public class HybridMouseEngine extends BaseEngine {
 
     @Override
     protected int scroll(KeyEvent ke) {
+        if (!isQueueEmpty) return 0;
+
         if (mService != null && scrollCodeMap.containsKey(ke.getKeyCode())) {
+            isQueueEmpty = false;
+
             PointF pointer = mPointerControl.getPointerLocation();
             int direction = scrollCodeMap.get(ke.getKeyCode());
             int momentum = momentumStack; // from BaseEngine
-            final int DURATION = scrollSpeed + 20; // scrollSpeed from BaseEngine
+            final int DURATION = 300 - scrollSpeed * 10; // scrollSpeed from BaseEngine
 
             PointF lineDirection = new PointF(
                     pointer.x + (momentum + 75) * PointerControl.dirX[direction],
                     pointer.y + (momentum + 75) * PointerControl.dirY[direction]);
 
             shellSwipe((int) pointer.x, (int) pointer.y, (int) lineDirection.x, (int) lineDirection.y, DURATION);
+
+            swipeGestureCoolDown = new CountDownTimer(DURATION + 200, 100) {
+                @Override
+                public void onTick(long millisUntilFinished) {}
+                @Override
+                public void onFinish() {
+                    isQueueEmpty = true;
+                }
+            };
+            swipeGestureCoolDown.start();
+
+            momentumStack += 1;
         }
         return 0;
     }
